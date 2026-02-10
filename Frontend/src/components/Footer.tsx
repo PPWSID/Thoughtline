@@ -11,11 +11,11 @@ const Footer = () => {
           </div>
           
           <div className="text-gray-500 text-sm">
-            &copy; {new Date().getFullYear()} Thoughtline. All rights reserved.
+            &copy; PPWSID {new Date().getFullYear()} Thoughtline. All right reserved.
           </div>
         </div>
         
-        <div className="mt-8 pt-8 border-t border-white/5 flex justify-center space-x-6">
+        {/* <div className="mt-8 pt-8 border-t border-white/5 flex justify-center space-x-6">
           <a href="#" className="text-gray-400 hover:text-brand-light transition-colors">
             Twitter
           </a>
@@ -25,7 +25,7 @@ const Footer = () => {
           <a href="#" className="text-gray-400 hover:text-brand-light transition-colors">
             Facebook
           </a>
-        </div>
+        </div> */}
       </div>
     </footer>
   );

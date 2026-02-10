@@ -15,7 +15,7 @@ const ArticleCard = ({ article }: ArticleCardProps) => {
       viewport={{ once: true }}
       whileHover={{ y: -5 }}
       transition={{ duration: 0.3 }}
-      className="group"
+      className="group h-full"
     >
       <Link to={`/article/${article.id}`} className="block h-full">
         <div className="bg-dark-card border border-dark-border rounded-2xl overflow-hidden h-full flex flex-col group-hover:border-brand-light/30 transition-colors shadow-xl">

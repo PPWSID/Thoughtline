@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ArticleList from './pages/ArticleList';
 import ArticleDetail from './pages/ArticleDetail';
+import CreateArticle from './pages/CreateArticle';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Routes>
             <Route path="/" element={<ArticleList />} />
             <Route path="/article/:id" element={<ArticleDetail />} />
+            <Route path="/create" element={<CreateArticle />} />
             {/* Fallback for categories and about since they are just requested as menus */}
             <Route path="/categories" element={<div className="pt-32 pb-20 text-center text-white">หน้านี้กำลังอยู่ระหว่างการพัฒนา</div>} />
             <Route path="/about" element={<div className="pt-32 pb-20 text-center text-white">หน้านี้กำลังอยู่ระหว่างการพัฒนา</div>} />
