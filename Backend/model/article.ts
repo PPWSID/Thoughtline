@@ -2,7 +2,10 @@ import mongoose, { Schema } from 'mongoose'
 
 const articleSchema = new Schema({
         title : { type: String },
+        excerpt : { type: String },
         content : { type: String },
+        coverImage : { type: String },
+        category : { type: String },
         author : { type: String },
         is_active : { type: Boolean },
     }, 

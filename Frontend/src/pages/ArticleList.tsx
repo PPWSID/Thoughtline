@@ -1,12 +1,43 @@
-import { mockArticles } from '../data/mockArticles';
+import { Article } from '../types/article';
 import ArticleCard from '../components/ArticleCard';
 import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import apiService from '../service/apiservice';
 
 const ArticleList = () => {
   const navigate = useNavigate();
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        const response = await apiService.getArticles();
+        if (response.status === 200) {
+          const result = response.data;
+          // Map backend Article to frontend Article type if needed
+          setArticles(result.data.map((item: any) => ({
+            ...item,
+            id: item._id, // MongoDB _id to id
+            publishedAt: new Date(item.createdAt).toLocaleDateString('th-TH', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            }),
+            readTime: item.readTime || '5 นาที' // Handle missing readTime
+          })));
+        }
+      } catch (error) {
+        console.error('Fetch Error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArticles();
+  }, []);
   return (
     <div className="pt-32 pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -44,19 +75,31 @@ const ArticleList = () => {
           </motion.div>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {mockArticles.map((article, index) => (
-            <motion.div
-              key={article.id}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="h-full"
-            >
-              <ArticleCard article={article} />
-            </motion.div>
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <div className="w-12 h-12 border-4 border-brand-light/20 border-t-brand-light rounded-full animate-spin"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {articles.length > 0 ? (
+              articles.map((article, index) => (
+                <motion.div
+                  key={article.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="h-full"
+                >
+                  <ArticleCard article={article} />
+                </motion.div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-20 text-gray-500">
+                ยังไม่มีบทความในขณะนี้
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

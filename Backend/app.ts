@@ -1,6 +1,7 @@
 import "./config/global.js";
 import express, { type Request, type Response } from 'express';
 import userRouter from './routes/user.js';
+import articleRouter from './routes/article.js';
 
 
 const app = express();
@@ -34,6 +35,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.use('/api/user', userRouter);
+app.use('/api/article', articleRouter);
 
 
 //------- Server Start & Port Config ------//

@@ -1,12 +1,50 @@
 import { useParams, Link } from 'react-router-dom';
-import { mockArticles } from '../data/mockArticles';
+
 import ReactMarkdown from 'react-markdown';
 import { ChevronLeft, Calendar, Clock, Share2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import apiService from '../service/apiservice';
+
+import { useState, useEffect } from 'react';
+import { Article } from '../types/article';
 
 const ArticleDetail = () => {
   const { id } = useParams();
-  const article = mockArticles.find((a) => a.id === id);
+  const [article, setArticle] = useState<Article | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchArticle = async () => {
+      try {
+        const response = await apiService.getArticleById(id as string);
+        if (response.status === 200) {
+          const result = response.data;
+          const item = result.data;
+          setArticle({
+            ...item,
+            id: item._id,
+            publishedAt: new Date(item.createdAt).toLocaleDateString('th-TH', {
+              year: 'numeric', month: 'long', day: 'numeric'
+            }),
+            readTime: item.readTime || '5 นาที'
+          });
+        }
+      } catch (error) {
+        console.error('Fetch Error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchArticle();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="pt-32 pb-20 flex justify-center">
+        <div className="w-12 h-12 border-4 border-brand-light/20 border-t-brand-light rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   if (!article) {
     return (
@@ -77,17 +115,19 @@ const ArticleDetail = () => {
           </header>
 
           {/* Cover Image */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="mb-12 rounded-3xl overflow-hidden shadow-2xl border border-white/5"
-          >
-            <img 
-              src={article.coverImage} 
-              alt={article.title} 
-              className="w-full h-[400px] object-cover"
-            />
-          </motion.div>
+          {article.coverImage && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="mb-12 rounded-3xl overflow-hidden shadow-2xl border border-white/5"
+            >
+              <img 
+                src={article.coverImage} 
+                alt={article.title} 
+                className="w-full h-[400px] object-cover"
+              />
+            </motion.div>
+          )}
 
           {/* Content */}
           <motion.div 

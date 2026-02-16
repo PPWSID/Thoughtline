@@ -62,7 +62,13 @@ async function loginUser(body: any) {
         }
 
         const token = jwt.sign(
-            { id: user._id, email: user.email, role: user.role },
+            { 
+                id: user._id, 
+                email: user.email, 
+                role: user.role,
+                name: user.name,
+                user_name: user.user_name
+            },
             SECRET_KEY,
             { expiresIn: '1d' }
         );
