@@ -1,11 +1,12 @@
 import "../config/global.js";
 import User from "../model/user.js";
+import Article from "../model/article.js";
 
 async function registerUser(body: any) {
     try {
         let { name, email, user_name, password, role, level, is_active, login_by, token } = body;
 
-        if (!name || !email || !password || !login_by) {
+        if (!name || !email || !password ) {
             return { error: "Fields are Required" };
         }
 
@@ -38,7 +39,6 @@ async function registerUser(body: any) {
         return newUser;
         
     } catch (error) {
-        console.log(error);
         return { error: "Internal server error" };
     }
 }
@@ -47,11 +47,12 @@ async function loginUser(body: any) {
     try {
         let { user_name, password } = body;
 
-        if (!password) {
-            return { error: "PassWord is Required" };
+        if (!user_name || !password) {
+            return { error: "Username and Password are Required" };
         }
 
-        const user = await User.findOne({ user_name  });
+        const user = await User.findOne({ user_name });
+
         if (!user) {
             return { error: "User not found" };
         }
@@ -61,6 +62,7 @@ async function loginUser(body: any) {
             return { error: "Invalid password" };
         }
 
+        // สร้าง Token
         const token = jwt.sign(
             { 
                 id: user._id, 
@@ -73,15 +75,62 @@ async function loginUser(body: any) {
             { expiresIn: '1d' }
         );
 
-        return { user, token };
+        // คืนค่าทั้ง User Object และ Token เพื่อให้ Controller นำไปใช้ต่อ
+        return {
+            user: {
+                id: user._id,
+                email: user.email,
+                role: user.role,
+                name: user.name,
+                user_name: user.user_name
+            },
+            token
+        };
     } catch (error) {
-        console.log(error);
         return { error: "Internal server error" };
     }
 }
 
+async function getProfile(userId: string) {
+    try {
+        const user = await User.findById(userId).select("-password -token");
+        if (!user) {
+            return { error: "User not found" };
+        }
+
+        const articleCount = await Article.countDocuments({ created_by: userId });
+
+        return {
+            user,
+            articleCount
+        };
+    } catch (error) {
+        return { error: "Internal server error" };
+    }
+}
+
+async function updateProfile(userId: string, body: any) {
+    try {
+        const { name, bio } = body;
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { name, bio },
+            { new: true }
+        ).select("-password -token");
+
+        if (!updatedUser) {
+            return { error: "User not found" };
+        }
+
+        return updatedUser;
+    } catch (error) {
+        return { error: "Internal server error" };
+    }
+}
 
 export default { 
     registerUser,
     loginUser,
+    getProfile,
+    updateProfile
 };

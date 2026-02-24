@@ -4,13 +4,12 @@ import auth from '../middleware/auth.js';
 
 const router = Router();
 
-// Public routes
-router.get('/', articlecontroller.getAllArticle);
-router.get('/:id', articlecontroller.getArticleById);
-
-// Protected routes
-router.post('/', articlecontroller.createArticle);
-router.put('/:id', auth.authMiddleware, articlecontroller.updateArticle);
-router.delete('/:id', auth.authMiddleware, articlecontroller.deleteArticle);
-
+router.get('/getall', articlecontroller.getAllArticle); // get all article
+router.get('/getbyid/:id', articlecontroller.getArticleById); // get article by id
+router.post('/create', auth.userPermission, articlecontroller.createArticle); // create article
+router.put('/updatebyid/:id', auth.userPermission, articlecontroller.updateArticle); // update article
+router.delete('/deletebyid/:id', auth.userPermission, articlecontroller.deleteArticle); // delete article
+router.get('/getbyown', auth.userPermission, articlecontroller.getOwnArticle); // get own article
+router.post('/getbyfilter', articlecontroller.getArticleByFilter); // get article by filter
+router.get('/getall-article',auth.userPermission, articlecontroller.getAllArticleWithLogin) // get all article with login
 export default router;

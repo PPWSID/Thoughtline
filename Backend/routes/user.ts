@@ -5,12 +5,12 @@ import auth from '../middleware/auth.js';
 
 const router = Router();
 
-router.post('/register', auth.authMiddleware , usercontroller.registerUser);
+router.post('/register' , usercontroller.registerUser);
 router.post('/login', usercontroller.loginUser);
+router.post('/logout', usercontroller.logoutUser);
 
-//ตัวอย่าง protected route
-router.get('/profile', auth.authMiddleware, (req, res) => {
-    res.json({ message: "This is a protected profile", user: (req as any).user });
-});
+// Profile routes
+router.get('/getprofile', auth.userPermission, usercontroller.getProfile);
+router.put('/updateprofile', auth.userPermission, usercontroller.updateProfile);
 
 export default router;

@@ -8,4 +8,6 @@ export interface Article {
   publishedAt: string;
   category: string;
   readTime: string;
+  created_by?: string;
+  isFavorite?: boolean;
 }
