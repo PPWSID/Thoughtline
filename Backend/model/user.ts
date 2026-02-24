@@ -10,6 +10,7 @@ const userSchema = new Schema({
         is_active : { type: Boolean },
         login_by : { type: String },
         token : { type: String },
+        bio : { type: String, default: "" },
     }, 
     {
         timestamps: true

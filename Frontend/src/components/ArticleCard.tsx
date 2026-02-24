@@ -1,13 +1,47 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Calendar, Clock, ChevronRight } from 'lucide-react';
+import { Calendar, Clock, ChevronRight, Heart } from 'lucide-react';
 import { Article } from '../types/article';
+import { useAuth } from '../AuthContext';
+import favoriteservice from '../service/favoriteservice';
+import { useState, useEffect } from 'react';
 
 interface ArticleCardProps {
   article: Article;
+  initialIsFavorite?: boolean;
+  onToggleFavorite?: (articleId: string, isFavorite: boolean) => void;
 }
 
-const ArticleCard = ({ article }: ArticleCardProps) => {
+const ArticleCard = ({ article, initialIsFavorite = false, onToggleFavorite }: ArticleCardProps) => {
+  const { isAuthenticated } = useAuth();
+  const [isFavorite, setIsFavorite] = useState(article.isFavorite || initialIsFavorite);
+
+  useEffect(() => {
+    if (article.isFavorite !== undefined) {
+      setIsFavorite(article.isFavorite);
+    }
+  }, [article.isFavorite]);
+
+  const handleFavorite = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!isAuthenticated) return;
+
+    try {
+      const response: any = await favoriteservice.toggleFavorite(article.id);
+      if (response.status === 200) {
+        const newStatus = response.data.data.action === 'added';
+        setIsFavorite(newStatus);
+        if (onToggleFavorite) {
+          onToggleFavorite(article.id, newStatus);
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -15,10 +49,20 @@ const ArticleCard = ({ article }: ArticleCardProps) => {
       viewport={{ once: true }}
       whileHover={{ y: -5 }}
       transition={{ duration: 0.3 }}
-      className="group h-full"
+      className="group h-full relative"
     >
+      {isAuthenticated && (
+        <button 
+          onClick={handleFavorite}
+          className="absolute top-4 right-4 z-10 p-2 bg-black/40 backdrop-blur-md rounded-full border border-white/10 hover:bg-black/60 transition-all active:scale-90"
+        >
+          <Heart className={`w-4 h-4 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-white'}`} />
+        </button>
+      )}
+
       <Link to={`/article/${article.id}`} className="block h-full">
         <div className="bg-dark-card border border-dark-border rounded-2xl overflow-hidden h-full flex flex-col group-hover:border-brand-light/30 transition-colors shadow-xl">
+          
           {/* Image Container */}
           <div className="relative h-48 overflow-hidden">
             <img
@@ -60,6 +104,7 @@ const ArticleCard = ({ article }: ArticleCardProps) => {
           </div>
         </div>
       </Link>
+
     </motion.div>
   );
 };

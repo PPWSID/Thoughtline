@@ -1,16 +1,16 @@
 import type { Request, Response } from "express";
 import usersevice from "../service/usersevice.js";
+import responebuilder from "../utils/responebuilder.js";
 
 async function registerUser(req: Request, res: Response) {
     try {
         const result: any = await usersevice.registerUser(req.body);
         if (result && result.error) {
-            return res.status(400).json({ error: result.error });
+            return responebuilder.responseError(res, 400, "Error registering user", result.error);
         }
-        return res.status(200).json({ data: result });
+        return responebuilder.responseSuccess(res, result, 200, "User registered successfully");
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({ error: "Internal server error" });
+        return responebuilder.responseError(res, 500, "Internal server error", error);
     }
 }
 
@@ -18,27 +18,60 @@ async function loginUser(req: Request, res: Response) {
     try {
         const result: any = await usersevice.loginUser(req.body);
         if (result && result.error) {
-            return res.status(401).json({ error: result.error });
+            return responebuilder.responseError(res, 401, "Error logging in user", result.error);
         }
 
-        // เก็บ Token ใน Cookie (Bearer Token)
-        res.cookie('token', result.token, {
-            httpOnly: true, // ป้องกัน XSS
-            secure: process.env.NODE_ENV === 'production', // ใช้ HTTPS ใน production
+        const { token, user } = result;
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: false,
             maxAge: 24 * 60 * 60 * 1000 // 1 วัน
         });
 
-        return res.status(200).json({ 
-            message: "Login successful"        
-        });
+        // ส่งกลับเฉพาะข้อมูล User (ซ่อน Token จาก Network Tab)
+        return responebuilder.responseSuccess(res, user, 200, "Login successful");
 
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({ error: "Internal server error" });
+        return responebuilder.responseError(res, 500, "Internal server error", error);
     }
+}
+
+async function getProfile(req: Request, res: Response) {
+    try {
+        const userId = (req as any).user.id;
+        const result: any = await usersevice.getProfile(userId);
+        if (result && result.error) {
+            return responebuilder.responseError(res, 400, "Error getting profile", result.error);
+        }
+        return responebuilder.responseSuccess(res, result, 200, "Profile retrieved successfully");
+    } catch (error) {
+        return responebuilder.responseError(res, 500, "Internal server error", error);
+    }
+}
+
+async function updateProfile(req: Request, res: Response) {
+    try {
+        const userId = (req as any).user.id;
+        const result: any = await usersevice.updateProfile(userId, req.body);
+        if (result && result.error) {
+            return responebuilder.responseError(res, 400, "Error updating profile", result.error);
+        }
+        return responebuilder.responseSuccess(res, result, 200, "Profile updated successfully");
+    } catch (error) {
+        return responebuilder.responseError(res, 500, "Internal server error", error);
+    }
+}
+
+async function logoutUser(req: Request, res: Response) {
+    res.clearCookie('token');
+    return responebuilder.responseSuccess(res, null, 200, "Logged out successfully");
 }
 
 export default {
     registerUser,
     loginUser,
+    logoutUser,
+    getProfile,
+    updateProfile
 };

@@ -16,7 +16,7 @@ dotenv.config();
 // Global declarations
 declare global {
   var express: any;
-  var cors: any;
+  var cors: typeof import("cors");
   var mongoose: typeof import("mongoose");
   var bodyParser: any;
   var axios: any;
@@ -30,21 +30,21 @@ declare global {
   var Colors: typeof TerminalColors;
 }
 
-global.express = express;
-global.cors = cors;
-global.mongoose = mongoose;
-global.bodyParser = bodyParser;
-global.axios = axios;
-global.bcrypt = bcrypt;
-global.fs = fs;
-global.path = path;
-global.GLOBAL_VALUE = process.env;
-global.Schema = mongoose.Schema;
-global.jwt = jwt;
-global.Colors = TerminalColors;
-global.SECRET_KEY = process.env.SecretKey as string;
+globalThis.express = express;
+globalThis.cors = cors;
+globalThis.mongoose = mongoose;
+globalThis.bodyParser = bodyParser;
+globalThis.axios = axios;
+globalThis.bcrypt = bcrypt;
+globalThis.fs = fs;
+globalThis.path = path;
+globalThis.GLOBAL_VALUE = process.env;
+globalThis.Schema = mongoose.Schema;
+globalThis.jwt = jwt;
+globalThis.Colors = TerminalColors;
+globalThis.SECRET_KEY = process.env.SecretKey as string;
 
-if (!global.SECRET_KEY) {
+if (!globalThis.SECRET_KEY) {
   console.error(`${Colors.red}[Failed] SecretKey is not defined${Colors.reset}`);
   process.exit(1);
 }

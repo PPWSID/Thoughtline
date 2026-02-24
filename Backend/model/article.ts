@@ -8,6 +8,8 @@ const articleSchema = new Schema({
         category : { type: String },
         author : { type: String },
         is_active : { type: Boolean },
+        created_by : { type: String },
+        updated_by : { type: String },
     }, 
     {
         timestamps: true

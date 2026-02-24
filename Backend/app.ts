@@ -2,32 +2,21 @@ import "./config/global.js";
 import express, { type Request, type Response } from 'express';
 import userRouter from './routes/user.js';
 import articleRouter from './routes/article.js';
-
+import favoriteRouter from './routes/favorite.js';
+import cookieHeader from "./middleware/cookieHeader.js";
 
 const app = express();
-const port = GLOBAL_VALUE.NODE_PORT || 5000;
+const port = GLOBAL_VALUE.NODE_PORT || 8808;
+// app.use(globalThis.cors());
+app.use(globalThis.cors({
+    origin: ['http://localhost:5173', 'http://localhost:3000'],
+    credentials: true
+}));
 
-app.use(global.cors());
-app.use(global.bodyParser.json());
+app.use(globalThis.bodyParser.json());
 
 // Middleware: Manual Cookie Parser
-app.use((req: any, res: any, next: any) => {
-    const cookieHeader = req.headers.cookie;
-    if (cookieHeader) {
-        const cookies: Record<string, string> = {};
-        cookieHeader.split(';').forEach((cookie: string) => {
-            const parts = cookie.split('=');
-            const name = parts[0]?.trim();
-            if (name) {
-                cookies[name] = parts.slice(1).join('=');
-            }
-        });
-        req.cookies = cookies;
-    } else {
-        req.cookies = {};
-    }
-    next();
-});
+app.use(cookieHeader.cookieHeader);
 
 //------------- Routes -------------//
 app.get('/', (req: Request, res: Response) => {
@@ -36,6 +25,7 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/api/user', userRouter);
 app.use('/api/article', articleRouter);
+app.use('/api/favorite', favoriteRouter);
 
 
 //------- Server Start & Port Config ------//

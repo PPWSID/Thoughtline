@@ -1,43 +1,25 @@
 import { Article } from '../types/article';
 import ArticleCard from '../components/ArticleCard';
 import { motion } from 'framer-motion';
-import { Plus } from 'lucide-react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Plus, BookOpen } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import apiService from '../service/articleservice';
 import Pagination from '../components/Pagination';
-import { useAuth } from '../AuthContext';
 
-const ArticleList = () => {
-  const { isAuthenticated } = useAuth();
+const MyArticles = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const category = searchParams.get('category');
-  const currentPage = parseInt(searchParams.get('page') || '1');
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const limit = 6;
+  const limit = 9;
 
   useEffect(() => {
     const fetchArticles = async () => {
       setLoading(true);
       try {
-        const fetchParams = { category, page: currentPage, limit };
-        let response: any;
-
-        if (isAuthenticated) {
-          // console.log(isAuthenticated);
-          // ถ้า Login แล้ว ใช้ getArticlesWithLogin 
-          response = await apiService.getArticlesWithLogin(fetchParams);
-        } else {
-          // ถ้ายังไม่ Login
-          // console.log(isAuthenticated);
-          response = category 
-            ? await apiService.getArticlesByFilter(fetchParams)
-            : await apiService.getArticles({ page: currentPage, limit });
-        }
-          
+        const response: any = await apiService.getOwnArticle({ page: currentPage, limit });
         if (response.status === 200) {
           const result = response.data;
           setArticles(result.data.articles.map((item: any) => ({
@@ -61,15 +43,14 @@ const ArticleList = () => {
 
     fetchArticles();
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [category, currentPage, isAuthenticated]);
+  }, [currentPage]);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
-      const params = new URLSearchParams(searchParams);
-      params.set('page', page.toString());
-      navigate(`/?${params.toString()}`);
+      setCurrentPage(page);
     }
   };
+
   return (
     <div className="pt-32 pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -79,11 +60,7 @@ const ArticleList = () => {
             animate={{ opacity: 1, scale: 1 }}
             className="text-4xl md:text-6xl font-bold text-white mb-6"
           >
-            {category ? (
-              <>หมวดหมู่ <span className="text-gradient">{category}</span></>
-            ) : (
-              <>สำรวจ <span className="text-gradient">ความคิดใหม่ๆ</span></>
-            )}
+            บทความ <span className="text-gradient">ของฉัน</span>
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0 }}
@@ -91,15 +68,14 @@ const ArticleList = () => {
             transition={{ delay: 0.2 }}
             className="text-gray-400 text-lg max-w-2xl mx-auto mb-8"
           >
-            ศูนย์รวมบทความด้านเทคโนโลยี ดีไซน์ และนวัตกรรม ที่จะช่วยเติมเต็มจินตนาการของคุณ 
-            อ่านง่าย สบายตา พร้อมเนื้อหาที่ทันสมัย
+            จัดการและแก้ไขบทความที่คุณเขียนขึ้นมาทั้งหมดได้ที่นี่
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="flex justify-center"
+            className="flex justify-center space-x-4"
           >
             <button 
               onClick={() => navigate('/create')}
@@ -108,6 +84,13 @@ const ArticleList = () => {
               <Plus className="w-5 h-5" />
               <span>สร้างบทความใหม่</span>
             </button>
+            <Link 
+              to="/"
+              className="flex items-center space-x-2 bg-white/5 text-gray-300 border border-white/10 px-6 py-3 rounded-xl font-bold hover:bg-white/10 transition-all transform hover:scale-105 active:scale-95"
+            >
+              <BookOpen className="w-5 h-5" />
+              <span>ดูบทความทั้งหมด</span>
+            </Link>
           </motion.div>
         </header>
 
@@ -131,13 +114,18 @@ const ArticleList = () => {
                   </motion.div>
                 ))
               ) : (
-                <div className="col-span-full text-center py-20 text-gray-500">
-                  ยังไม่มีบทความในขณะนี้
+                <div className="col-span-full text-center py-20 flex flex-col items-center">
+                  <div className="text-gray-500 mb-4 text-lg text-center">คุณยังไม่ได้สร้างบทความใดๆ</div>
+                  <button 
+                    onClick={() => navigate('/create')}
+                    className="text-brand-light hover:underline font-medium"
+                  >
+                    เริ่มสร้างบทความแรกของคุณเลย!
+                  </button>
                 </div>
               )}
             </div>
 
-            {/* Pagination UI */}
             <Pagination 
               currentPage={currentPage}
               totalPages={totalPages}
@@ -150,4 +138,4 @@ const ArticleList = () => {
   );
 };
 
-export default ArticleList;
+export default MyArticles;

@@ -1,17 +1,21 @@
 import { useParams, Link } from 'react-router-dom';
 
 import ReactMarkdown from 'react-markdown';
-import { ChevronLeft, Calendar, Clock, Share2 } from 'lucide-react';
+import { ChevronLeft, Calendar, Clock, Share2, Edit, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
-import apiService from '../service/apiservice';
+import { useAuth } from '../AuthContext';
+import apiService from '../service/articleservice';
+import favoriteservice from '../service/favoriteservice';
 
 import { useState, useEffect } from 'react';
 import { Article } from '../types/article';
 
 const ArticleDetail = () => {
   const { id } = useParams();
+  const { user, isAuthenticated } = useAuth();
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -35,8 +39,34 @@ const ArticleDetail = () => {
         setLoading(false);
       }
     };
+    const fetchStatus = async () => {
+      if (isAuthenticated && id) {
+        try {
+          const response: any = await favoriteservice.checkIsFavorite(id);
+          if (response.status === 200) {
+            setIsFavorite(response.data.data.isFavorite);
+          }
+        } catch (error) {
+          console.error('Error checking favorite status:', error);
+        }
+      }
+    };
+
     fetchArticle();
-  }, [id]);
+    fetchStatus();
+  }, [id, isAuthenticated]);
+
+  const handleToggleFavorite = async () => {
+    if (!isAuthenticated || !id) return;
+    try {
+      const response: any = await favoriteservice.toggleFavorite(id);
+      if (response.status === 200) {
+        setIsFavorite(response.data.data.action === 'added');
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+    }
+  };
 
   if (loading) {
     return (
@@ -107,9 +137,28 @@ const ArticleDetail = () => {
                   <span>ใช้เวลาอ่าน {article.readTime}</span>
                 </div>
 
-                <button className="ml-auto text-gray-400 hover:text-brand-light">
-                  <Share2 className="w-5 h-5" />
-                </button>
+                <div className="ml-auto flex items-center space-x-4">
+                  {isAuthenticated && user?.id === article.created_by && (
+                    <Link 
+                      to={`/edit/${article.id}`}
+                      className="flex items-center space-x-2 text-gray-400 hover:text-brand-light transition-colors group"
+                    >
+                      <Edit className="w-5 h-5" />
+                      <span className="text-sm font-medium hidden sm:inline">แก้ไขบทความ</span>
+                    </Link>
+                  )}
+                  <button className="text-gray-400 hover:text-brand-light transition-colors">
+                    <Share2 className="w-5 h-5" />
+                  </button>
+                  {isAuthenticated && (
+                    <button 
+                      onClick={handleToggleFavorite}
+                      className={`transition-all active:scale-90 ${isFavorite ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
+                    >
+                      <Heart className={`w-5 h-5 ${isFavorite ? 'fill-red-500' : ''}`} />
+                    </button>
+                  )}
+                </div>
               </div>
             </motion.div>
           </header>

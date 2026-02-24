@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useParams } from 'react-router-dom';
 import { motion, Reorder, AnimatePresence } from 'framer-motion';
 import { 
   ChevronLeft, Send, Image as ImageIcon, 
   Type, Code, Trash2, GripVertical, 
-  Heading as HeadingIcon, Eye
+  Heading as HeadingIcon, Eye, CheckCircle2, AlertCircle, X
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import apiService from '../service/apiservice';
+import apiService from '../service/articleservice';
 
 interface Block {
   id: string;
@@ -20,17 +20,124 @@ interface Block {
   };
 }
 
+const parseMarkdownToBlocks = (markdown: string): Block[] => {
+  if (!markdown) return [{ id: Math.random().toString(36).substring(7), type: 'text', content: '' }];
+  
+  const blocks: Block[] = [];
+  const lines = markdown.split('\n');
+  let currentText = '';
+
+  const flushText = () => {
+    if (currentText.trim()) {
+      blocks.push({
+        id: Math.random().toString(36).substring(7),
+        type: 'text',
+        content: currentText.trim()
+      });
+      currentText = '';
+    }
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    
+    // Heading
+    if (line.match(/^#+\s/)) {
+      flushText();
+      const level = (line.match(/^#+/)?.[0].length || 2);
+      blocks.push({
+        id: Math.random().toString(36).substring(7),
+        type: 'heading',
+        content: line.replace(/^#+\s/, ''),
+        metadata: { level }
+      });
+    } 
+    // Image
+    else if (line.match(/^!\[.*\]\(.*\)/)) {
+      flushText();
+      const match = line.match(/^!\[(.*)\]\((.*)\)/);
+      blocks.push({
+        id: Math.random().toString(36).substring(7),
+        type: 'image',
+        content: match?.[2] || '',
+        metadata: { caption: match?.[1] || '' }
+      });
+    }
+    // Code
+    else if (line.startsWith('```')) {
+      flushText();
+      const lang = line.slice(3).trim();
+      let code = '';
+      i++;
+      while (i < lines.length && !lines[i].startsWith('```')) {
+        code += lines[i] + '\n';
+        i++;
+      }
+      blocks.push({
+        id: Math.random().toString(36).substring(7),
+        type: 'code',
+        content: code.trim(),
+        metadata: { language: lang || 'javascript' }
+      });
+    }
+    // Regular text
+    else {
+      if (line.trim() || currentText) {
+        currentText += line + '\n';
+      }
+    }
+  }
+  flushText();
+
+  return blocks.length > 0 ? blocks : [{ id: Math.random().toString(36).substring(7), type: 'text', content: '' }];
+};
+
 const CreateArticle = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const isEdit = !!id;
+
   const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('Technology');
-  const [coverImage, setCoverImage] = useState('');
-  const [blocks, setBlocks] = useState<Block[]>([
-    { id: '1', type: 'text', content: '' }
-  ]);
+  const [category, setCategory] = useState('');
+  const [coverImage, setCoverImage] = useState('Default');
+  const [blocks, setBlocks] = useState<Block[]>([]);
   const [isPreview, setIsPreview] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [excerpt, setExcerpt] = useState('');
+  const [notification, setNotification] = useState<{ show: boolean, message: string, type: 'success' | 'error' }>({
+    show: false,
+    message: '',
+    type: 'success'
+  });
+
+  useEffect(() => {
+    if (isEdit) {
+      const fetchArticle = async () => {
+        try {
+          const response = await apiService.getArticleById(id as string);
+          if (response.status === 200) {
+            const article = response.data.data;
+            setTitle(article.title);
+            setCategory(article.category);
+            setCoverImage(article.coverImage);
+            setExcerpt(article.excerpt);
+            // Parse Markdown back to blocks
+            setBlocks(parseMarkdownToBlocks(article.content));
+          }
+        } catch (error) {
+          console.error('Fetch Error:', error);
+        }
+      };
+      fetchArticle();
+    } else {
+      // Reset state for new article
+      setTitle('');
+      setCategory('Default');
+      setCoverImage('');
+      setExcerpt('');
+      setBlocks([{ id: Math.random().toString(36).substring(7), type: 'text', content: '' }]);
+    }
+  }, [id, isEdit]);
 
   const addBlock = (type: Block['type'], index?: number) => {
     const newBlock: Block = {
@@ -61,7 +168,7 @@ const CreateArticle = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title) return alert('กรุณาใส่ชื่อบทความ');
+    if (!title) return setNotification({ show: true, message: 'กรุณาใส่ชื่อบทความ', type: 'error' });
 
     setIsSubmitting(true);
     const finalContent = blocks.map(b => {
@@ -79,20 +186,38 @@ const CreateArticle = () => {
       content: finalContent
     };
 
-    console.log('Sending Article Body:', body);
-
     try {
-      const response = await apiService.createArticle(body);
+      let response;
+      if (isEdit) {
+        response = await apiService.updateArticle(id as string, body);
+      } else {
+        response = await apiService.createArticle(body);
+      }
 
       if (response.status === 200 || response.status === 201) {
-        alert('เผยแพร่บทความเรียบร้อยแล้ว!');
-        navigate('/');
+        setNotification({
+          show: true,
+          message: isEdit ? 'อัปเดตบทความเรียบร้อยแล้ว!' : 'เผยแพร่บทความของคุณเรียบร้อยแล้ว!',
+          type: 'success'
+        });
+        setTimeout(() => {
+          setNotification(prev => ({ ...prev, show: false }));
+          navigate(isEdit ? `/article/${id}` : '/');
+        }, 2000);
       } else {
-        alert(`เกิดข้อผิดพลาด: ไม่สามารถเผยแพร่บทความได้`);
+        setNotification({
+          show: true,
+          message: isEdit ? 'ไม่สามารถอัปเดตบทความได้' : 'ไม่สามารถเผยแพร่บทความได้',
+          type: 'error'
+        });
       }
     } catch (error: any) {
       console.error('Submit Error:', error);
-      alert(`เกิดข้อผิดพลาด: ${error?.error || 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้'}`);
+      setNotification({
+        show: true,
+        message: error?.error || 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้',
+        type: 'error'
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -126,7 +251,7 @@ const CreateArticle = () => {
               className={`flex items-center space-x-2 bg-brand-light text-dark-bg px-6 py-2.5 rounded-xl font-bold hover:bg-brand-aqua transition-all transform hover:scale-[1.05] active:scale-[0.95] shadow-lg shadow-brand-light/20 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <Send className={`w-4 h-4 ${isSubmitting ? 'animate-pulse' : ''}`} />
-              <span>{isSubmitting ? 'กำลังเผยแพร่...' : 'เผยแพร่'}</span>
+              <span>{isSubmitting ? (isEdit ? 'กำลังบันทึก...' : 'กำลังเผยแพร่...') : (isEdit ? 'บันทึกการแก้ไข' : 'เผยแพร่')}</span>
             </button>
           </div>
         </div>
@@ -148,8 +273,9 @@ const CreateArticle = () => {
                   <select 
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="bg-brand-light/10 text-brand-light border border-brand-light/20 rounded-full px-4 py-1 font-semibold outline-none"
+                    className="bg-dark-card text-brand-light border border-white/10 rounded-full px-4 py-1 font-semibold outline-none hover:border-brand-light/30 transition-all cursor-pointer"
                   >
+                    <option value="">Default</option>
                     <option value="Technology">Technology</option>
                     <option value="Design">Design</option>
                     <option value="Future">Future</option>
@@ -370,6 +496,71 @@ const CreateArticle = () => {
           </div>
         </div>
       </div>
+
+      {/* Beautiful Notification Toast */}
+      <AnimatePresence>
+        {notification.show && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9, x: '-50%' }}
+            animate={{ opacity: 1, y: 0, scale: 1, x: '-50%' }}
+            exit={{ opacity: 0, y: 20, scale: 0.9, x: '-50%' }}
+            className="fixed bottom-10 left-1/2 z-[100]"
+          >
+            <div className={`
+              relative flex items-center space-x-4 px-6 py-4 rounded-2xl border backdrop-blur-xl shadow-2xl
+              ${notification.type === 'success' 
+                ? 'bg-green-500/10 border-green-500/20 shadow-green-500/10' 
+                : 'bg-red-500/10 border-red-500/20 shadow-red-500/10'}
+            `}>
+              {/* Glow Effect */}
+              <div className={`absolute inset-0 blur-2xl opacity-20 rounded-2xl -z-10 ${notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`} />
+              
+              <div className={`
+                w-10 h-10 rounded-full flex items-center justify-center shrink-0
+                ${notification.type === 'success' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}
+              `}>
+                {notification.type === 'success' ? (
+                  <motion.div
+                    initial={{ scale: 0, rotate: -45 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{ type: 'spring', damping: 12 }}
+                  >
+                    <CheckCircle2 className="w-6 h-6" />
+                  </motion.div>
+                ) : (
+                  <AlertCircle className="w-6 h-6" />
+                )}
+              </div>
+
+              <div className="flex flex-col">
+                <span className="text-white font-bold tracking-wide">
+                  {notification.type === 'success' ? 'สำเร็จ!' : 'ขออภัย'}
+                </span>
+                <span className="text-gray-400 text-sm">
+                  {notification.message}
+                </span>
+              </div>
+
+              <button 
+                onClick={() => setNotification(prev => ({ ...prev, show: false }))}
+                className="ml-4 p-1 rounded-lg hover:bg-white/5 text-gray-500 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              {/* Progress Bar (Success only) */}
+              {notification.type === 'success' && (
+                <motion.div 
+                  initial={{ width: '100%' }}
+                  animate={{ width: '0%' }}
+                  transition={{ duration: 2, ease: 'linear' }}
+                  className="absolute bottom-0 left-0 h-1 bg-green-500/50 rounded-full"
+                />
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

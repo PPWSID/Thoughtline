@@ -3,7 +3,8 @@ import axios from 'axios';
 const createHttpRequest = (apiUrl: string) => {
   const instance = axios.create({
     baseURL: apiUrl,
-    timeout: 120000
+    timeout: 120000,
+    withCredentials: true
   });
 
   instance.defaults.headers.common['Content-Type'] = 'application/json';
@@ -36,11 +37,11 @@ const createHttpRequest = (apiUrl: string) => {
 
   return {
     instance,
-    get: instance.get,
-    put: instance.put,
-    post: instance.post,
-    delete: instance.delete,
-    patch: instance.patch,
+    get: instance.get.bind(instance),
+    put: instance.put.bind(instance),
+    post: instance.post.bind(instance),
+    delete: instance.delete.bind(instance),
+    patch: instance.patch.bind(instance),
     setHeader,
     setAuthorization
   };
