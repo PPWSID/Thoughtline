@@ -1,6 +1,10 @@
 import "../config/global.js";
 import User from "../model/user.js";
 import Article from "../model/article.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
+const SECRET_KEY = process.env.SecretKey as string;
 
 async function registerUser(body: any) {
     try {
@@ -55,6 +59,14 @@ async function loginUser(body: any) {
 
         if (!user) {
             return { error: "User not found" };
+        }
+
+        if (typeof password !== "string") {
+            return { error: "Password is required" };
+        }
+
+        if (typeof user?.password !== "string") {
+            return { error: "User password not found" };
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
