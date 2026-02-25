@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import apiService from '../service/articleservice';
+import { mockCategory } from '../data/mockCategory';
 
 interface Block {
   id: string;
@@ -275,10 +276,12 @@ const CreateArticle = () => {
                     onChange={(e) => setCategory(e.target.value)}
                     className="bg-dark-card text-brand-light border border-white/10 rounded-full px-4 py-1 font-semibold outline-none hover:border-brand-light/30 transition-all cursor-pointer"
                   >
-                    <option value="">Default</option>
-                    <option value="Technology">Technology</option>
-                    <option value="Design">Design</option>
-                    <option value="Future">Future</option>
+                    <option value="Default">Default</option>
+                    {mockCategory.map((cat) => (
+                      <option key={cat.name} value={cat.name}>
+                        {cat.name}
+                      </option>
+                    ))}
                   </select>
                   <div className="flex items-center space-x-2 bg-dark-card border border-dark-border rounded-full px-4 py-1 text-gray-400 focus-within:border-brand-light/50 transition-colors">
                     <ImageIcon className="w-4 h-4" />

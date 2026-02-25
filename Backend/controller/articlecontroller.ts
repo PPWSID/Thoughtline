@@ -5,12 +5,14 @@ import responsebuilder from "../utils/responebuilder.js";
 
 async function createArticle(req: Request, res: Response) {
     try {
+        
         const result: any = await articleservice.createArticle(req.body, (req as any).user);
         if (result && result.error) {
             return responsebuilder.responseError(res, 400, "Error creating article", result.error);
         }
         return responsebuilder.responseSuccess(res, result, 200, "Article created successfully");
     } catch (error) {
+        console.log(error);
         return responsebuilder.responseError(res, 500, "Internal server error", error);
     }
 }
@@ -20,6 +22,8 @@ async function getAllArticle(req: Request, res: Response) {
         const result = await articleservice.getAllArticle(req.query, (req as any).user);
         return responsebuilder.responseSuccess(res, result, 200, "Article retrieved successfully");
     } catch (error) {
+        console.log(error);
+        
         return responsebuilder.responseError(res, 500, "Internal server error", error);
     }
 }
@@ -93,6 +97,42 @@ async function getAllArticleWithLogin(req: Request, res: Response) {
     }
 }
 
+async function reportArticle(req: Request, res: Response) {
+    try {
+        const result: any = await articleservice.reportArticle(req.body, req.params.id as string, (req as any).user);
+        if (result && result.error) {
+            return responsebuilder.responseError(res, 400, "Error reporting article", result.error);
+        }
+        return responsebuilder.responseSuccess(res, result, 200, "Article reported successfully");
+    } catch (error) {
+        return responsebuilder.responseError(res, 500, "Internal server error", error);
+    }
+}
+
+async function getReportedArticles(req: Request, res: Response) {
+    try {
+        const result: any = await articleservice.getReportedArticles();
+        if (result && result.error) {
+            return responsebuilder.responseError(res, 400, "Error getting reported articles", result.error);
+        }
+        return responsebuilder.responseSuccess(res, result, 200, "Reported articles retrieved successfully");
+    } catch (error) {
+        return responsebuilder.responseError(res, 500, "Internal server error", error);
+    }
+}
+
+async function deleteReport(req: Request, res: Response) {
+    try {
+        const result: any = await articleservice.deleteReport(req.params.id as string);
+        if (result && result.error) {
+            return responsebuilder.responseError(res, 400, "Error deleting report", result.error);
+        }
+        return responsebuilder.responseSuccess(res, result, 200, "Report deleted successfully");
+    } catch (error) {
+        return responsebuilder.responseError(res, 500, "Internal server error", error);
+    }
+}
+
 export default {
     createArticle,
     getAllArticle,
@@ -101,5 +141,8 @@ export default {
     deleteArticle,
     getOwnArticle,
     getArticleByFilter,
-    getAllArticleWithLogin
+    getAllArticleWithLogin,
+    reportArticle,
+    getReportedArticles,
+    deleteReport,
 };

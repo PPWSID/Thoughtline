@@ -1,7 +1,7 @@
-import { log } from "node:console";
 import "../config/global.js";
 import Article from "../model/article.js";
 import Favorite from "../model/favorite.js";
+import ReportedArticle from "../model/reportedArticle.js";
 
 async function getAllArticle(query: any = {} , user : any) {
   try {
@@ -62,6 +62,8 @@ async function createArticle(body: any, user: any) {
     await newArticle.save();
     return newArticle;
   } catch (error) {
+    console.log(error);
+    
     return { error: "Internal server error" };
   }
 }
@@ -83,8 +85,16 @@ async function updateArticle(id: string, body: any, user: any) {
 
 async function deleteArticle(id: string) {
   try {
+    // ลบจาก Article
     const deletedArticle = await Article.findByIdAndDelete(id);
     if (!deletedArticle) return { error: "Article not found" };
+
+    // ลบจาก Favorite
+    await Favorite.deleteMany({ articleId: id });
+
+    // ลบจาก ReportedArticle
+    await ReportedArticle.deleteMany({ articleId: id });
+
     return { message: "Article deleted successfully" };
   } catch (error) {
     return { error: "Internal server error" };
@@ -103,12 +113,11 @@ async function getArticleById(id: any) {
 
 async function getArticleByCategory(category: any) {
   try {
-    return await Article.find({ category, is_active: true });
+    return await Article.find({ category, is_active: true }).lean();
   } catch (error) {
     return { error: "Internal server error" };
   }
 }
-
 
 async function getOwnArticle(user: any, query: any = {}) {
   try {
@@ -120,10 +129,20 @@ async function getOwnArticle(user: any, query: any = {}) {
     const articles = await Article.find({ created_by: user.id })
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
+
+    const articlesWithFavorites = await Promise.all(
+      articles.map(async (article: any) => {
+        return {
+          ...article,
+          isFavorite: user ? await checkIsFavorite(article._id, user) : false
+        };
+      })
+    );
 
     return {
-      articles,
+      articles: articlesWithFavorites,
       pagination: {
         totalCount,
         totalPages: Math.ceil(totalCount / limit),
@@ -154,7 +173,8 @@ async function getArticleByFilter(body: any) {
     const articles = await Article.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limitNum);
+      .limit(limitNum)
+      .lean();
 
     return {
       articles,
@@ -225,6 +245,56 @@ async function checkIsFavorite(articleId: any, user: any) {
   }
 }
 
+async function reportArticle(body: any ,articleId: any, user: any) {
+  try {
+    const {reason_type, reason} = body;
+    const article = await Article.findById(articleId);
+    if (!article) return { error: "Article not found" };
+    const newReportedArticle = new ReportedArticle({
+      articleId,
+      reason_type,
+      reason,
+      reported_by: user.id
+    });
+    await newReportedArticle.save();
+    return { message: "Article reported successfully" };
+  } catch (error) {
+    return { error: "Internal server error" };
+  }
+}
+
+async function getReportedArticles() {
+  try {
+    const reports = await ReportedArticle.find().sort({ createdAt: -1 }).lean();
+    
+    // Populate article details manually
+    const populatedReports = await Promise.all(
+      reports.map(async (report: any) => {
+        const article = await Article.findById(report.articleId).lean();
+        return {
+          ...report,
+          articleTitle: article?.title || "ไม่พบบทความนี้แล้ว",
+          articleImage: article?.coverImage || "",
+          id: report._id
+        };
+      })
+    );
+
+    return populatedReports;
+  } catch (error) {
+    return { error: "Internal server error" };
+  }
+}
+
+async function deleteReport(id: string) {
+  try {
+    const deletedReport = await ReportedArticle.findByIdAndDelete(id);
+    if (!deletedReport) return { error: "Report not found" };
+    return { message: "Report dismissed successfully" };
+  } catch (error) {
+    return { error: "Internal server error" };
+  }
+}
 
 export default { 
   createArticle,
@@ -236,4 +306,7 @@ export default {
   getOwnArticle,
   getArticleByFilter,
   getAllArticleWithLogin,
+  reportArticle,
+  getReportedArticles,
+  deleteReport,
 };

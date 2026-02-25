@@ -23,7 +23,8 @@ const createHttpRequest = (apiUrl: string) => {
       return response;
     },
     (error) => {
-      return Promise.reject(error.response?.data);
+      // If server is down or network error, error.response will be undefined
+      return Promise.reject(error.response?.data || error);
     }
   );
 

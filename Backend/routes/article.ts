@@ -12,4 +12,7 @@ router.delete('/deletebyid/:id', auth.userPermission, articlecontroller.deleteAr
 router.get('/getbyown', auth.userPermission, articlecontroller.getOwnArticle); // get own article
 router.post('/getbyfilter', articlecontroller.getArticleByFilter); // get article by filter
 router.get('/getall-article',auth.userPermission, articlecontroller.getAllArticleWithLogin) // get all article with login
+router.post('/report/:id', auth.userPermission, articlecontroller.reportArticle); // report article
+router.get('/getreported', auth.adminPermission, articlecontroller.getReportedArticles); // admin: get reported articles
+router.delete('/deletereport/:id', auth.adminPermission, articlecontroller.deleteReport); // admin: delete report
 export default router;
