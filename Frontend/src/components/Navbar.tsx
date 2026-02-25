@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
-import { Menu, BookOpen, Layers, ChevronDown, Rocket, PenTool, Cpu, X, LogIn, User, LogOut, Settings, Boxes, Heart  } from 'lucide-react';
+import { Menu, BookOpen, Layers, ChevronDown, PenTool, X, LogIn, User, LogOut, Settings, Heart, ShieldIcon } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../AuthContext';
+import { mockCategory } from '../data/mockCategory';
 
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -10,12 +11,6 @@ const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
 
-  const categories = [
-    { name: 'Development', path: '/?category=Development', icon: <Rocket className="w-4 h-4" /> },
-    { name: 'Design', path: '/?category=Design', icon: <PenTool className="w-4 h-4" /> },
-    { name: 'Technology', path: '/?category=Technology', icon: <Cpu className="w-4 h-4" /> },
-    { name: 'อื่นๆ', path: '/?category=others', icon: <Boxes className="w-4 h-4" /> },
-  ];
 
   const navLinks = isAuthenticated ? [
     { name: 'หน้าแรก', path: '/', icon: <BookOpen className="w-4 h-4" /> },
@@ -73,7 +68,7 @@ const Navbar = () => {
                     transition={{ duration: 0.2 }}
                     className="absolute top-full left-0 w-48 py-2 bg-dark-card border border-white/10 rounded-xl shadow-2xl backdrop-blur-xl"
                   >
-                    {categories.map((cat) => (
+                    {mockCategory.map((cat) => (
                       <Link
                         key={cat.path}
                         to={cat.path}
@@ -120,6 +115,16 @@ const Navbar = () => {
                         <Settings className="w-4 h-4" />
                         <span>โปรไฟล์</span>
                       </Link>
+
+                      {isAuthenticated && user?.role === "admin" && (
+                        <Link
+                          to="/admin"
+                          className="flex items-center space-x-3 px-4 py-2.5 text-sm text-cyan-500 hover:bg-red-500/10 transition-all"
+                        >
+                          <ShieldIcon  className="w-4 h-4" />
+                          <span>ผู้ดูแลระบบ</span>
+                        </Link>
+                      )}
                      
                       <button
                         onClick={logout}
@@ -183,7 +188,7 @@ const Navbar = () => {
                   <span>หมวดหมู่ทั้งหมด</span>
                 </div>
                 <div className="grid grid-cols-1 gap-2">
-                  {categories.map((cat) => (
+                  {mockCategory.map((cat) => (
                     <Link
                       key={cat.path}
                       to={cat.path}

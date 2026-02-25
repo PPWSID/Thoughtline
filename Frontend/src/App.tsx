@@ -9,6 +9,7 @@ import MyArticles from './pages/MyArticles';
 import Auth from './pages/Auth';
 import Profile from './pages/Profile';
 import Favorites from './pages/Favorites';
+import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -50,6 +51,11 @@ function App() {
               <Route path="/favorites" element={
                 <ProtectedRoute>
                   <Favorites />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin" element={
+                <ProtectedRoute>
+                  <AdminDashboard />
                 </ProtectedRoute>
               } />
               {/* Fallback for categories and about since they are just requested as menus */}
