@@ -1,5 +1,16 @@
 import type { Request, Response, NextFunction } from 'express';
 import responebuilder from '../utils/responebuilder.js';
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import TerminalColors from "../constants/color.js";
+
+dotenv.config();
+
+const SECRET_KEY = process.env.SecretKey as string;
+
+if (!SECRET_KEY) {
+    console.error(`${TerminalColors.red}[Failed] SecretKey is not defined${TerminalColors.reset}`);
+}
 
 const userPermission = (req: Request, res: Response, next: NextFunction) => {
     try {

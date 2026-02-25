@@ -4,16 +4,20 @@ import userRouter from './routes/user.js';
 import articleRouter from './routes/article.js';
 import favoriteRouter from './routes/favorite.js';
 import cookieHeader from "./middleware/cookieHeader.js";
+import cors from "cors";
+import bodyParser from "body-parser";
+import axios from "axios";
+import TerminalColors from "./constants/color.js";
 
 const app = express();
-const port = GLOBAL_VALUE.NODE_PORT || 8808;
+const port = process.env.NODE_PORT || 8808;
 // app.use(globalThis.cors());
-app.use(globalThis.cors({
+app.use(cors({
     origin: ['http://localhost:5173', 'http://localhost:3000'],
     credentials: true
 }));
 
-app.use(globalThis.bodyParser.json());
+app.use(bodyParser.json());
 
 // Middleware: Manual Cookie Parser
 app.use(cookieHeader.cookieHeader);
@@ -30,20 +34,20 @@ app.use('/api/favorite', favoriteRouter);
 
 //------- Server Start & Port Config ------//
 if (!port) {
-  console.log(`${Colors.red}[failed] task 1 start service port : Port is not defined.`);
-  console.log(`${Colors.yellow}Exit process with code 1`);
+  console.log(`${TerminalColors.red}[failed] task 1 start service port : Port is not defined.`);
+  console.log(`${TerminalColors.yellow}Exit process with code 1`);
   process.exit(1);
 }
 
 const server = app.listen(port, () => {
-  console.log(`${Colors.green}[success] task 1 start service port : ${Colors.yellow}${port}`);
+  console.log(`${TerminalColors.green}[success] task 1 start service port : ${TerminalColors.yellow}${port}`);
 });
 
 server.on('error', (err: any) => {
-  console.log(`${Colors.red}[failed] task 1 start service port : ${port}`);
+  console.log(`${TerminalColors.red}[failed] task 1 start service port : ${port}`);
   console.error(err);
-  console.log(`${Colors.yellow}Exit process with code 1`);
-  console.log(`${Colors.yellow} try in cmd :  ${Colors.cyan} netstat -ano | findstr :${port} \n then : taskkill /PID <PID> /F ${Colors.yellow} to kill process`);
+  console.log(`${TerminalColors.yellow}Exit process with code 1`);
+  console.log(`${TerminalColors.yellow} try in cmd :  ${TerminalColors.cyan} netstat -ano | findstr :${port} \n then : taskkill /PID <PID> /F ${TerminalColors.yellow} to kill process`);
   process.exit(1);
 });
 
@@ -52,9 +56,9 @@ server.once('listening', async () => {
     // Wait a bit for the server to be fully ready before testing
     await new Promise(resolve => setTimeout(resolve, 500));
     const response = await axios.get(`http://localhost:${port}`);
-    console.log(`${Colors.green}[success] Task 2 Test API Success:`, `${Colors.yellow}${response.statusText}${Colors.reset}`);
+    console.log(`${TerminalColors.green}[success] Task 2 Test API Success:`, `${TerminalColors.yellow}${response.statusText}${TerminalColors.reset}`);
   } catch (error: any) {
-    console.error(`${Colors.red}[failed] Test API:`, `${error.message}${Colors.reset}`);
+    console.error(`${TerminalColors.red}[failed] Test API:`, `${error.message}${TerminalColors.reset}`);
   }
 });
 
