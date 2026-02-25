@@ -1,4 +1,4 @@
-import { Network, Rocket, PenTool, Cpu, Boxes } from 'lucide-react';
+import { Network, Rocket, PenTool, Boxes } from 'lucide-react';
 import { Category } from '../types/category';
 
 export const mockCategory: Category[] = [
@@ -17,11 +17,11 @@ export const mockCategory: Category[] = [
         path: '/?category=Design', 
         icon: <PenTool className="w-4 h-4" /> 
     },
-    { 
-        name: 'Technology', 
-        path: '/?category=Technology', 
-        icon: <Cpu className="w-4 h-4" /> 
-    },
+    // { 
+    //     name: 'Technology', 
+    //     path: '/?category=Technology', 
+    //     icon: <Cpu className="w-4 h-4" /> 
+    // },
     { 
         name: 'อื่นๆ', 
         path: '/?category=others', 
