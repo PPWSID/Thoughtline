@@ -29,6 +29,18 @@ const articleservice = {
 
   getArticlesByFilter(filter: any) {
     return httpRequest.post('/article/getbyfilter', filter);
+  },
+
+  reportArticle(id: string, payload: any) {
+    return httpRequest.post(`/article/report/${id}`, payload);
+  },
+  
+  getReportedArticles() {
+    return httpRequest.get('/article/getreported');
+  },
+
+  deleteReport(id: string) {
+    return httpRequest.delete(`/article/deletereport/${id}`);
   }
 };
 

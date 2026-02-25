@@ -68,7 +68,7 @@ mongoose
     console.error(
       `${Colors.red}[Failed] Task 3 : ${String(error)}${Colors.reset}`
     );
-    process.exit(1);
+    // process.exit(1); // Don't crash the server, just let it run without DB for now
   });
 
 export {};

@@ -8,10 +8,6 @@ const favoriteservice = {
   getFavorites() {
     return httpRequest.get('/favorite/getall');
   },
-
-  checkIsFavorite(articleId: string) {
-    return httpRequest.get(`/favorite/check/${articleId}`);
-  }
 };
 
 export default favoriteservice;
