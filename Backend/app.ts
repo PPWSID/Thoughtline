@@ -8,6 +8,15 @@ import cors from "cors";
 import bodyParser from "body-parser";
 
 const app = express();
+// แก้ cache vercel 304 etag
+app.set('etag', false);
+
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  next();
+});
 
 // CORS (ปรับ origin ตอน prod ได้)
 app.use(
