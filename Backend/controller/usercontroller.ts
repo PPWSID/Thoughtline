@@ -23,10 +23,17 @@ async function loginUser(req: Request, res: Response) {
 
         const { token, user } = result;
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: false,
-            maxAge: 24 * 60 * 60 * 1000 // 1 วัน
+        // res.cookie('token', token, {
+        //     httpOnly: true,
+        //     secure: false, // ใช้ได้กับ http
+        //     maxAge: 24 * 60 * 60 * 1000 // 1 วัน
+        // });
+        
+        res.cookie("token", token, {
+          httpOnly: true,
+          secure: true,        // จำเป็นเมื่อใช้ https
+          sameSite: "none",    //  จำเป็นเมื่อข้าม domain
+          maxAge: 24 * 60 * 60 * 1000,
         });
 
         // ส่งกลับเฉพาะข้อมูล User (ซ่อน Token จาก Network Tab)
