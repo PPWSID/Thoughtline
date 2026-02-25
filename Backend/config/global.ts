@@ -5,7 +5,7 @@ import bodyParser from "body-parser";
 import axios from "axios";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import * as bcrypt from "bcryptjs";
+import bcrypt from "bcryptjs";
 import fs from "node:fs";
 import path from "node:path";
 
