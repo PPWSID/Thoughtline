@@ -20,7 +20,7 @@ declare global {
   var mongoose: typeof import("mongoose");
   var bodyParser: any;
   var axios: any;
-  var bcrypt: any;
+  var bcrypt: typeof import("bcryptjs");
   var fs: typeof import("node:fs");
   var path: typeof import("node:path");
   var GLOBAL_VALUE: NodeJS.ProcessEnv;
@@ -35,7 +35,6 @@ globalThis.cors = cors;
 globalThis.mongoose = mongoose;
 globalThis.bodyParser = bodyParser;
 globalThis.axios = axios;
-globalThis.bcrypt = bcrypt;
 globalThis.fs = fs;
 globalThis.path = path;
 globalThis.GLOBAL_VALUE = process.env;
