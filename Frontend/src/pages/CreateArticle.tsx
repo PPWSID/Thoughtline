@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useParams } from 'react-router-dom';
-import { motion, Reorder, AnimatePresence } from 'framer-motion';
+import { motion, Reorder, AnimatePresence, useDragControls } from 'framer-motion';
 import { 
   ChevronLeft, Send, Image as ImageIcon, 
   Type, Code, Trash2, GripVertical, 
@@ -91,6 +91,184 @@ const parseMarkdownToBlocks = (markdown: string): Block[] => {
   flushText();
 
   return blocks.length > 0 ? blocks : [{ id: Math.random().toString(36).substring(7), type: 'text', content: '' }];
+};
+
+const BlockItem = ({ 
+  block, 
+  index, 
+  isPreview, 
+  updateBlock, 
+  removeBlock, 
+  addBlock 
+}: { 
+  block: Block, 
+  index: number, 
+  isPreview: boolean, 
+  updateBlock: (id: string, content: string, metadata?: any) => void,
+  removeBlock: (id: string) => void,
+  addBlock: (type: Block['type'], index?: number) => void
+}) => {
+  const dragControls = useDragControls();
+
+  return (
+    <Reorder.Item 
+      value={block}
+      dragListener={false}
+      dragControls={dragControls}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      className="group relative"
+    >
+      {!isPreview ? (
+        <div className="flex gap-4">
+          {/* Drag Handle - Only this part can start the drag */}
+          <div 
+            onPointerDown={(e) => dragControls.start(e)}
+            className="flex flex-col items-center pt-3 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
+          >
+            <GripVertical className="w-5 h-5 text-gray-600" />
+          </div>
+
+          {/* Block Editor UI */}
+          <div className="flex-grow bg-dark-card/50 border border-dark-border rounded-2xl p-6 hover:border-brand-light/30 transition-all focus-within:border-brand-light/50 focus-within:bg-dark-card">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-gray-500">
+                {block.type === 'text' && <Type className="w-3 h-3" />}
+                {block.type === 'heading' && <HeadingIcon className="w-3 h-3" />}
+                {block.type === 'image' && <ImageIcon className="w-3 h-3" />}
+                {block.type === 'code' && <Code className="w-3 h-3" />}
+                <span>{block.type}</span>
+              </div>
+              <button 
+                onClick={() => removeBlock(block.id)}
+                className="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+
+            {block.type === 'text' && (
+              <textarea 
+                placeholder="เริ่มพิมพ์เนื้อหา..."
+                value={block.content}
+                onChange={(e) => updateBlock(block.id, e.target.value)}
+                autoFocus
+                rows={1}
+                style={{ height: 'auto', minHeight: '100px' }}
+                onInput={(e) => {
+                  const target = e.target as HTMLTextAreaElement;
+                  target.style.height = 'auto';
+                  target.style.height = target.scrollHeight + 'px';
+                }}
+                className="w-full bg-transparent border-none text-gray-300 resize-none outline-none leading-relaxed text-lg"
+              />
+            )}
+
+            {block.type === 'heading' && (
+              <div className="flex items-center gap-4">
+                <select 
+                  value={block.metadata?.level}
+                  onChange={(e) => updateBlock(block.id, block.content, { level: parseInt(e.target.value) })}
+                  className="bg-dark-bg border border-dark-border rounded-lg px-2 py-1 text-xs text-gray-400 outline-none"
+                >
+                  <option value={2}>H2</option>
+                  <option value={3}>H3</option>
+                  <option value={4}>H4</option>
+                </select>
+                <input 
+                  type="text"
+                  placeholder="ใส่หัวข้อรอง..."
+                  value={block.content}
+                  onChange={(e) => updateBlock(block.id, e.target.value)}
+                  className="flex-grow bg-transparent border-none text-2xl font-bold text-white outline-none"
+                />
+              </div>
+            )}
+
+            {block.type === 'image' && (
+              <div className="space-y-4">
+                <input 
+                  type="text"
+                  placeholder="ใส่ URL รูปภาพ..."
+                  value={block.content}
+                  onChange={(e) => updateBlock(block.id, e.target.value)}
+                  className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-2 text-sm text-white outline-none focus:border-brand-light/50"
+                />
+                <input 
+                  type="text"
+                  placeholder="คำบรรยายรูปภาพ (Caption)..."
+                  value={block.metadata?.caption || ''}
+                  onChange={(e) => updateBlock(block.id, block.content, { caption: e.target.value })}
+                  className="w-full bg-transparent border-none text-xs text-gray-500 outline-none italic"
+                />
+                {block.content && (
+                  <div className="mt-4 rounded-xl overflow-hidden border border-white/5">
+                    <img src={block.content} alt="Block Preview" className="w-full max-h-[300px] object-cover" />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {block.type === 'code' && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500">ภาษา:</span>
+                  <input 
+                    type="text" 
+                    placeholder="เช่น typescript, python..."
+                    value={block.metadata?.language || ''}
+                    onChange={(e) => updateBlock(block.id, block.content, { language: e.target.value })}
+                    className="bg-dark-bg border border-dark-border rounded-lg px-3 py-1 text-xs text-brand-aqua outline-none"
+                  />
+                </div>
+                <textarea 
+                  placeholder="วางโค้ดที่นี่..."
+                  value={block.content}
+                  onChange={(e) => updateBlock(block.id, e.target.value)}
+                  className="w-full bg-dark-bg border border-dark-border rounded-xl p-4 text-sm font-mono text-brand-aqua outline-none min-h-[150px]"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Add block button between */}
+          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex items-center space-x-1 bg-dark-card border border-brand-light/20 rounded-full p-1 shadow-xl">
+              <BlockActionBtn icon={<Type />} onClick={() => addBlock('text', index)} tooltip="ข้อความ" />
+              <BlockActionBtn icon={<HeadingIcon />} onClick={() => addBlock('heading', index)} tooltip="หัวข้อ" />
+              <BlockActionBtn icon={<ImageIcon />} onClick={() => addBlock('image', index)} tooltip="รูปภาพ" />
+              <BlockActionBtn icon={<Code />} onClick={() => addBlock('code', index)} tooltip="โค้ด" />
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* Preview Mode Rendering - Matches Article Detail Prose */
+        <div className="prose prose-invert max-w-none">
+          {block.type === 'text' && <ReactMarkdown>{block.content}</ReactMarkdown>}
+          {block.type === 'heading' && React.createElement(`h${block.metadata?.level || 2}`, {}, block.content)}
+          {block.type === 'image' && block.content && (
+            <figure className="my-8">
+              <img src={block.content} alt={block.metadata?.caption} className="rounded-2xl w-full" />
+              {block.metadata?.caption && (
+                <figcaption className="text-center text-gray-500 text-sm mt-3">{block.metadata.caption}</figcaption>
+              )}
+            </figure>
+          )}
+          {block.type === 'code' && block.content && (
+            <div className="my-8">
+              <div className="flex items-center justify-between bg-dark-card border-x border-t border-dark-border rounded-t-xl px-4 py-2">
+                <span className="text-xs text-gray-500 font-mono italic">{block.metadata?.language}</span>
+              </div>
+              <pre className="!mt-0 !rounded-t-none">
+                <code>{block.content}</code>
+              </pre>
+            </div>
+          )}
+        </div>
+      )}
+    </Reorder.Item>
+  );
 };
 
 const CreateArticle = () => {
@@ -328,159 +506,15 @@ const CreateArticle = () => {
             <Reorder.Group axis="y" values={blocks} onReorder={setBlocks} className="space-y-6">
               <AnimatePresence initial={false}>
                 {blocks.map((block, index) => (
-                  <Reorder.Item 
-                    key={block.id} 
-                    value={block}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    className="group relative"
-                  >
-                    {!isPreview ? (
-                      <div className="flex gap-4">
-                        {/* Drag Handle */}
-                        <div className="flex flex-col items-center pt-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <GripVertical className="w-5 h-5 text-gray-600 cursor-grab active:cursor-grabbing" />
-                        </div>
-
-                        {/* Block Editor UI */}
-                        <div className="flex-grow bg-dark-card/50 border border-dark-border rounded-2xl p-6 hover:border-brand-light/30 transition-all focus-within:border-brand-light/50 focus-within:bg-dark-card">
-                          <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-gray-500">
-                              {block.type === 'text' && <Type className="w-3 h-3" />}
-                              {block.type === 'heading' && <HeadingIcon className="w-3 h-3" />}
-                              {block.type === 'image' && <ImageIcon className="w-3 h-3" />}
-                              {block.type === 'code' && <Code className="w-3 h-3" />}
-                              <span>{block.type}</span>
-                            </div>
-                            <button 
-                              onClick={() => removeBlock(block.id)}
-                              className="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-
-                          {block.type === 'text' && (
-                            <textarea 
-                              placeholder="เริ่มพิมพ์เนื้อหา..."
-                              value={block.content}
-                              onChange={(e) => updateBlock(block.id, e.target.value)}
-                              autoFocus
-                              rows={1}
-                              style={{ height: 'auto', minHeight: '100px' }}
-                              onInput={(e) => {
-                                const target = e.target as HTMLTextAreaElement;
-                                target.style.height = 'auto';
-                                target.style.height = target.scrollHeight + 'px';
-                              }}
-                              className="w-full bg-transparent border-none text-gray-300 resize-none outline-none leading-relaxed text-lg"
-                            />
-                          )}
-
-                          {block.type === 'heading' && (
-                            <div className="flex items-center gap-4">
-                              <select 
-                                value={block.metadata?.level}
-                                onChange={(e) => updateBlock(block.id, block.content, { level: parseInt(e.target.value) })}
-                                className="bg-dark-bg border border-dark-border rounded-lg px-2 py-1 text-xs text-gray-400 outline-none"
-                              >
-                                <option value={2}>H2</option>
-                                <option value={3}>H3</option>
-                                <option value={4}>H4</option>
-                              </select>
-                              <input 
-                                type="text"
-                                placeholder="ใส่หัวข้อรอง..."
-                                value={block.content}
-                                onChange={(e) => updateBlock(block.id, e.target.value)}
-                                className="flex-grow bg-transparent border-none text-2xl font-bold text-white outline-none"
-                              />
-                            </div>
-                          )}
-
-                          {block.type === 'image' && (
-                            <div className="space-y-4">
-                              <input 
-                                type="text"
-                                placeholder="ใส่ URL รูปภาพ..."
-                                value={block.content}
-                                onChange={(e) => updateBlock(block.id, e.target.value)}
-                                className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-2 text-sm text-white outline-none focus:border-brand-light/50"
-                              />
-                              <input 
-                                type="text"
-                                placeholder="คำบรรยายรูปภาพ (Caption)..."
-                                value={block.metadata?.caption || ''}
-                                onChange={(e) => updateBlock(block.id, block.content, { caption: e.target.value })}
-                                className="w-full bg-transparent border-none text-xs text-gray-500 outline-none italic"
-                              />
-                              {block.content && (
-                                <div className="mt-4 rounded-xl overflow-hidden border border-white/5">
-                                  <img src={block.content} alt="Block Preview" className="w-full max-h-[300px] object-cover" />
-                                </div>
-                              )}
-                            </div>
-                          )}
-
-                          {block.type === 'code' && (
-                            <div className="space-y-4">
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs text-gray-500">ภาษา:</span>
-                                <input 
-                                  type="text"
-                                  placeholder="เช่น typescript, python..."
-                                  value={block.metadata?.language || ''}
-                                  onChange={(e) => updateBlock(block.id, block.content, { language: e.target.value })}
-                                  className="bg-dark-bg border border-dark-border rounded-lg px-3 py-1 text-xs text-brand-aqua outline-none"
-                                />
-                              </div>
-                              <textarea 
-                                placeholder="วางโค้ดที่นี่..."
-                                value={block.content}
-                                onChange={(e) => updateBlock(block.id, e.target.value)}
-                                className="w-full bg-dark-bg border border-dark-border rounded-xl p-4 text-sm font-mono text-brand-aqua outline-none min-h-[150px]"
-                              />
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Add block button between */}
-                        <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <div className="flex items-center space-x-1 bg-dark-card border border-brand-light/20 rounded-full p-1 shadow-xl">
-                            <BlockActionBtn icon={<Type />} onClick={() => addBlock('text', index)} tooltip="ข้อความ" />
-                            <BlockActionBtn icon={<HeadingIcon />} onClick={() => addBlock('heading', index)} tooltip="หัวข้อ" />
-                            <BlockActionBtn icon={<ImageIcon />} onClick={() => addBlock('image', index)} tooltip="รูปภาพ" />
-                            <BlockActionBtn icon={<Code />} onClick={() => addBlock('code', index)} tooltip="โค้ด" />
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      /* Preview Mode Rendering - Matches Article Detail Prose */
-                      <div className="prose prose-invert max-w-none">
-                        {block.type === 'text' && <ReactMarkdown>{block.content}</ReactMarkdown>}
-                        {block.type === 'heading' && React.createElement(`h${block.metadata?.level || 2}`, {}, block.content)}
-                        {block.type === 'image' && block.content && (
-                          <figure className="my-8">
-                            <img src={block.content} alt={block.metadata?.caption} className="rounded-2xl w-full" />
-                            {block.metadata?.caption && (
-                              <figcaption className="text-center text-gray-500 text-sm mt-3">{block.metadata.caption}</figcaption>
-                            )}
-                          </figure>
-                        )}
-                        {block.type === 'code' && block.content && (
-                          <div className="my-8">
-                            <div className="flex items-center justify-between bg-dark-card border-x border-t border-dark-border rounded-t-xl px-4 py-2">
-                              <span className="text-xs text-gray-500 font-mono italic">{block.metadata?.language}</span>
-                            </div>
-                            <pre className="!mt-0 !rounded-t-none">
-                              <code>{block.content}</code>
-                            </pre>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </Reorder.Item>
+                  <BlockItem 
+                    key={block.id}
+                    block={block}
+                    index={index}
+                    isPreview={isPreview}
+                    updateBlock={updateBlock}
+                    removeBlock={removeBlock}
+                    addBlock={addBlock}
+                  />
                 ))}
               </AnimatePresence>
             </Reorder.Group>
@@ -497,7 +531,9 @@ const CreateArticle = () => {
               </div>
             )}
           </div>
+          
         </div>
+
       </div>
 
       {/* Beautiful Notification Toast */}
