@@ -1,0 +1,339 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 50;
+  background: rgba(22, 30, 38, 0.7); /* glass-card equivalent */
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.container {
+  max-width: 80rem; /* 7xl */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+.navContent {
+  display: flex;
+  justify-content: space-between;
+  height: 4rem; /* h-16 */
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.5rem; /* 2xl */
+  font-weight: 700;
+  background: linear-gradient(135deg, #00ffff 0%, #7fffd4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-decoration: none;
+}
+
+.desktopNav {
+  display: none;
+  align-items: center;
+  gap: 1.5rem; /* space-x-6 */
+}
+
+@media (min-width: 768px) {
+  .desktopNav {
+    display: flex;
+  }
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* space-x-2 */
+  color: #d1d5db; /* text-gray-300 */
+  transition: color 0.3s ease;
+  font-weight: 500;
+  font-size: 0.875rem; /* text-sm */
+  text-decoration: none;
+}
+
+.navLink:hover {
+  color: #00ffff; /* brand-light */
+}
+
+.dropdownWrapper {
+  position: relative;
+}
+
+.dropdownButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #d1d5db;
+  transition: color 0.3s ease;
+  font-weight: 500;
+  font-size: 0.875rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdownButton:hover {
+  color: #00ffff;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 12rem; /* w-48 */
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  background-color: #161e26; /* dark-card */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(24px);
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: #9ca3af;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.dropdownItem:hover {
+  color: #00ffff;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.userButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: rgba(0, 255, 255, 0.1);
+  color: #00ffff;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.userAvatar {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  background-color: rgba(0, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+}
+
+.loginButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #d1d5db;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.loginButton:hover {
+  background-color: rgba(0, 255, 255, 0.1);
+  color: #00ffff;
+  border-color: rgba(0, 255, 255, 0.2);
+}
+
+.mobileMenuButton {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: #d1d5db;
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .mobileMenuButton {
+    display: none;
+  }
+}
+
+.mobileMenu {
+  background-color: rgba(10, 15, 20, 0.95);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(24px);
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .mobileMenu {
+    display: none;
+  }
+}
+
+.mobileMenuContent {
+  padding: 0.5rem 1rem 1.5rem 1rem;
+}
+
+.mobileNavLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #d1d5db;
+  padding: 1rem 0;
+  font-size: 1rem;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  text-decoration: none;
+}
+
+.mobileNavLinkIcon {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  display: flex;
+}
+
+.mobileCategorySection {
+  padding-top: 1rem;
+}
+
+.mobileCategoryHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 1rem;
+  padding: 0 0.5rem;
+}
+
+.mobileCategoryGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+}
+
+.mobileCategoryItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #d1d5db;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.mobileUserSection {
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mobileUserInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  background-color: rgba(0, 255, 255, 0.05);
+  border: 1px solid rgba(0, 255, 255, 0.1);
+  margin-bottom: 0.5rem;
+}
+
+.mobileUserAvatarBig {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background-color: rgba(0, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobileUserDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobileUserName {
+  color: white;
+  font-weight: 700;
+}
+
+.mobileUserEmail {
+  color: #6b7280;
+  font-size: 0.75rem;
+}
+
+.mobileActionButton {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 1rem;
+  color: #d1d5db;
+  font-size: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: none;
+  border-left: none;
+  border-right: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.mobileLogoutButton {
+  color: #f87171; /* red-400 */
+}
+
+.mobileLoginAction {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  background-color: #00ffff;
+  color: #0a0f14;
+  padding: 1rem;
+  border-radius: 1rem;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}

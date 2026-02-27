@@ -1,0 +1,201 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(12px);
+}
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 28rem; /* max-w-md */
+  background: rgba(22, 30, 38, 0.7); /* glass-card equivalent */
+  backdrop-filter: blur(10px);
+  border-radius: 2rem;
+  padding: 2.5rem; /* p-10 */
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glowTop {
+  position: absolute;
+  top: -5rem;
+  right: -5rem;
+  width: 10rem;
+  height: 10rem;
+  background-color: rgba(0, 255, 255, 0.1);
+  filter: blur(80px);
+  border-radius: 9999px;
+}
+
+.glowBottom {
+  position: absolute;
+  bottom: -5rem;
+  left: -5rem;
+  width: 10rem;
+  height: 10rem;
+  background-color: rgba(0, 255, 255, 0.05);
+  filter: blur(80px);
+  border-radius: 9999px;
+}
+
+.closeButton {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  padding: 0.5rem;
+  color: #6b7280;
+  transition: color 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+}
+
+.closeButton:hover {
+  color: white;
+}
+
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.iconBox {
+  padding: 1.25rem;
+  border-radius: 1rem;
+  border: 1px solid transparent;
+  margin-bottom: 2rem;
+  backdrop-filter: blur(24px);
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  display: flex;
+}
+
+/* Dynamic Icon Box Styles */
+.dangerIconBox {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.1);
+}
+
+.successIconBox {
+  background-color: rgba(0, 255, 255, 0.1);
+  border-color: rgba(0, 255, 255, 0.2);
+  color: #7fffd4;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
+}
+
+.infoIconBox {
+  background-color: rgba(0, 255, 255, 0.1);
+  border-color: rgba(0, 255, 255, 0.2);
+  color: #00ffff;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
+}
+
+.title {
+  font-size: 1.875rem; /* 3xl */
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.message {
+  color: #9ca3af;
+  margin-bottom: 2.5rem;
+  line-height: 1.625;
+  font-size: 1.125rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.buttonGroup {
+  display: flex;
+  width: 100%;
+  gap: 1rem;
+}
+
+.cancelButton {
+  flex: 0.8;
+  padding: 1rem 1.5rem;
+  border-radius: 1rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #d1d5db;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.875rem;
+}
+
+.cancelButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.cancelButton:active {
+  transform: scale(0.95);
+}
+
+.confirmButton {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  border-radius: 1rem;
+  font-weight: 900;
+  transition: all 0.3s ease;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.875rem;
+  border: none;
+}
+
+.confirmButton:hover {
+  transform: scale(1.02);
+}
+
+.confirmButton:active {
+  transform: scale(0.95);
+}
+
+/* Dynamic Confirm Button Styles */
+.dangerButton {
+  background-color: #ef4444;
+  color: white;
+  box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3);
+}
+
+.dangerButton:hover {
+  background-color: #dc2626;
+}
+
+.brandButton {
+  background-color: #00ffff;
+  color: #0a0f14;
+  box-shadow: 0 10px 15px -3px rgba(0, 255, 255, 0.3);
+}
+
+.brandButton:hover {
+  background-color: #7fffd4;
+}

@@ -1,5 +1,4 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
-
 import ReactMarkdown from 'react-markdown';
 import { ChevronLeft, Calendar, Clock, Share2, Edit, Heart, Trash , TriangleAlert } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -8,9 +7,9 @@ import apiService from '../service/articleservice';
 import favoriteservice from '../service/favoriteservice';
 import ConfirmModal from '../components/ConfirmModal';
 import ReportModal from '../components/ReportModal';
-
 import { useState, useEffect } from 'react';
 import { Article } from '../types/article';
+import styles from '../styles/ArticleDetail.module.css';
 
 const ArticleDetail = () => {
   const { id } = useParams();
@@ -46,21 +45,8 @@ const ArticleDetail = () => {
         setLoading(false);
       }
     };
-    // const fetchStatus = async () => {
-    //   if (isAuthenticated && id) {
-    //     try {
-    //       const response: any = await favoriteservice.checkIsFavorite(id);
-    //       if (response.status === 200) {
-    //         setIsFavorite(response.data.data.isFavorite);
-    //       }
-    //     } catch (error) {
-    //       console.error('Error checking favorite status:', error);
-    //     }
-    //   }
-    // };
 
     fetchArticle();
-    // fetchStatus();
   }, [id, isAuthenticated]);
 
   const handleToggleFavorite = async () => {
@@ -90,7 +76,6 @@ const ArticleDetail = () => {
       if (response.status === 200) {
         setSuccessMessage('ลบบทความของคุณเรียบร้อยแล้ว ระบบกำลังพากลับหน้าแรก...');
         setShowSuccessAlert(true);
-        // นำทางกลับหลังจากแสดง Alert สำเร็จซักครู่
         setTimeout(() => {
           navigate('/');
         }, 2000);
@@ -120,17 +105,17 @@ const ArticleDetail = () => {
 
   if (loading) {
     return (
-      <div className="pt-32 pb-20 flex justify-center">
-        <div className="w-12 h-12 border-4 border-brand-light/20 border-t-brand-light rounded-full animate-spin"></div>
+      <div className={styles.loadingContainer}>
+        <div className={styles.spinner}></div>
       </div>
     );
   }
 
   if (!article) {
     return (
-      <div className="pt-32 pb-20 text-center">
-        <h1 className="text-2xl text-white">ไม่พบบทความที่คุณต้องการ</h1>
-        <Link to="/" className="text-brand-light mt-4 inline-block hover:underline">
+      <div className={styles.notFound}>
+        <h1 className={styles.notFoundTitle}>ไม่พบบทความที่คุณต้องการ</h1>
+        <Link to="/" className={styles.backLink}>
           กลับไปหน้าแรก
         </Link>
       </div>
@@ -138,72 +123,72 @@ const ArticleDetail = () => {
   }
 
   return (
-    <div className="pt-32 pb-20">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6">
+    <div className={styles.container}>
+      <div className={styles.wrapper}>
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="mb-8"
+          className={styles.backButtonWrapper}
         >
           <Link 
             to="/" 
-            className="inline-flex items-center text-gray-400 hover:text-brand-light transition-colors group"
+            className={styles.backButton}
           >
-            <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />
+            <ChevronLeft className={styles.backIcon} />
             กลับไปที่หน้าบทความ
           </Link>
         </motion.div>
 
         <article>
           {/* Header */}
-          <header className="mb-12">
+          <header className={styles.header}>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <div className="flex items-center space-x-2 text-brand-aqua font-semibold uppercase tracking-widest text-sm mb-4">
+              <div className={styles.categoryBadge}>
                 <span>{article.category}</span>
               </div>
               
-              <h1 className="text-3xl md:text-5xl font-bold text-white mb-8 leading-tight">
+              <h1 className={styles.title}>
                 {article.title}
               </h1>
 
-              <div className="flex flex-wrap items-center gap-6 text-gray-400 border-y border-white/5 py-4">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 rounded-full bg-brand-dark flex items-center justify-center text-white font-bold text-xs">
+              <div className={styles.metaRow}>
+                <div className={styles.authorInfo}>
+                  <div className={styles.authorAvatar}>
                     {article.author.charAt(0)}
                   </div>
-                  <span className="text-sm font-medium">{article.author}</span>
+                  <span className={styles.authorName}>{article.author}</span>
                 </div>
                 
-                <div className="flex items-center space-x-1.5 text-sm">
+                <div className={styles.metaItem}>
                   <Calendar className="w-4 h-4" />
                   <span>{article.publishedAt}</span>
                 </div>
 
-                <div className="flex items-center space-x-1.5 text-sm">
+                <div className={styles.metaItem}>
                   <Clock className="w-4 h-4" />
                   <span>ใช้เวลาอ่าน {article.readTime}</span>
                 </div>
 
-                <div className="ml-auto flex items-center space-x-4">
+                <div className={styles.actionButtons}>
                   {isAuthenticated && user?.id === article.created_by && (
                     <Link 
                       to={`/edit/${article.id}`}
-                      className="flex items-center space-x-2 text-gray-400 hover:text-brand-light transition-colors group"
+                      className={styles.editLink}
                     >
                       <Edit className="w-5 h-5" />
                       <span className="text-sm font-medium hidden sm:inline">แก้ไขบทความ</span>
                     </Link>
                   )}
-                  <button className="text-gray-400 hover:text-brand-light transition-colors">
+                  <button className={styles.shareLink}>
                     <Share2 className="w-5 h-5" />
                   </button>
                   {isAuthenticated && (
                     <button 
                       onClick={handleToggleFavorite}
-                      className={`transition-all active:scale-90 ${isFavorite ? 'text-red-500' : 'text-gray-400 hover:text-red-500'}`}
+                      className={`${styles.favoriteButton} ${isFavorite ? styles.favoriteActive : styles.favoriteInactive}`}
                     >
                       <Heart className={`w-5 h-5 ${isFavorite ? 'fill-red-500' : ''}`} />
                     </button>
@@ -211,7 +196,7 @@ const ArticleDetail = () => {
                   {isAuthenticated && ( user?.id === article.created_by || user?.role === 'admin') && (
                     <button 
                       onClick={handleDelete}
-                      className="flex items-center space-x-2 text-gray-400 hover:text-red-500 transition-colors group"
+                      className={styles.deleteButton}
                       title="ลบบทความ"
                     >
                       <Trash className="w-5 h-5" />
@@ -220,7 +205,7 @@ const ArticleDetail = () => {
                   {isAuthenticated && user?.id !== article.created_by && (
                     <button 
                       onClick={handleReport}
-                      className="flex items-center space-x-2 text-gray-400 hover:text-red-500 transition-colors group"
+                      className={styles.reportButton}
                       title="รายงานบทความ"
                     >
                       <TriangleAlert className="w-5 h-5" />
@@ -237,12 +222,12 @@ const ArticleDetail = () => {
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="mb-12 rounded-3xl overflow-hidden shadow-2xl border border-white/5"
+              className={styles.coverImageWrapper}
             >
               <img 
                 src={article.coverImage} 
                 alt={article.title} 
-                className="w-full h-[400px] object-cover"
+                className={styles.coverImage}
               />
             </motion.div>
           )}
@@ -252,18 +237,18 @@ const ArticleDetail = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="prose prose-invert max-w-none"
+            className={styles.content}
           >
             <ReactMarkdown>{article.content}</ReactMarkdown>
           </motion.div>
         </article>
 
         {/* Categories / Tags */}
-        <div className="mt-16 pt-8 border-t border-white/5">
-          <h4 className="text-white font-semibold mb-4">หมวดหมู่เพิ่มเติม</h4>
-          <div className="flex gap-2">
+        <div className={styles.footerSection}>
+          <h4 className={styles.footerTitle}>หมวดหมู่เพิ่มเติม</h4>
+          <div className={styles.tagList}>
             {['React', 'Web Design', 'Future'].map(tag => (
-              <span key={tag} className="px-3 py-1 bg-dark-card border border-dark-border rounded-full text-xs text-gray-400">
+              <span key={tag} className={styles.tagBadge}>
                 #{tag}
               </span>
             ))}

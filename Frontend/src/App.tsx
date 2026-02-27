@@ -10,16 +10,17 @@ import Auth from './pages/Auth';
 import Profile from './pages/Profile';
 import Favorites from './pages/Favorites';
 import AdminDashboard from './pages/AdminDashboard';
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './auth/ProtectedRoute';
+import styles from './styles/App.module.css';
 
 function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="flex flex-col min-h-screen">
+        <div className={styles.appWrapper}>
           <Navbar />
           
-          <main className="flex-grow">
+          <main className={styles.mainContent}>
             <Routes>
               <Route path="/" element={<ArticleList />} />
               <Route path="/my-articles" element={
@@ -59,8 +60,8 @@ function App() {
                 </ProtectedRoute>
               } />
               {/* Fallback for categories and about since they are just requested as menus */}
-              <Route path="/categories" element={<div className="pt-32 pb-20 text-center text-white">หน้านี้กำลังอยู่ระหว่างการพัฒนา</div>} />
-              <Route path="/about" element={<div className="pt-32 pb-20 text-center text-white">หน้านี้กำลังอยู่ระหว่างการพัฒนา</div>} />
+              <Route path="/categories" element={<div className={styles.placeholderPage}>หน้านี้กำลังอยู่ระหว่างการพัฒนา</div>} />
+              <Route path="/about" element={<div className={styles.placeholderPage}>หน้านี้กำลังอยู่ระหว่างการพัฒนา</div>} />
             </Routes>
           </main>
 

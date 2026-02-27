@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../AuthContext';
 import { mockCategory } from '../data/mockCategory';
+import styles from '../styles/Navbar.module.css';
 
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -21,24 +22,24 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="fixed top-0 w-full z-50 glass-card border-b border-white/5">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
+    <nav className={styles.navbar}>
+      <div className={styles.container}>
+        <div className={styles.navContent}>
 
           {/* Logo */}
           <div className="flex items-center">
-            <Link to="/" className="text-2xl font-bold text-gradient">
+            <Link to="/" className={styles.logo}>
               Thoughtline
             </Link>
           </div>
 
           {/* Desktop Links */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className={styles.desktopNav}>
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                className="flex items-center space-x-2 text-gray-300 hover:text-brand-light transition-colors font-medium text-sm"
+                className={styles.navLink}
               >
                 {link.icon}
                 <span>{link.name}</span>
@@ -47,13 +48,11 @@ const Navbar = () => {
 
             {/* Categories Dropdown */}
             <div 
-              className="relative"
+              className={styles.dropdownWrapper}
               onMouseEnter={() => setIsDropdownOpen(true)}
               onMouseLeave={() => setIsDropdownOpen(false)}
             >
-              <button
-                className="flex items-center space-x-2 text-gray-300 hover:text-brand-light transition-colors font-medium text-sm py-4"
-              >
+              <button className={styles.dropdownButton}>
                 <Layers className="w-4 h-4" />
                 <span>หมวดหมู่</span>
                 <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
@@ -66,13 +65,13 @@ const Navbar = () => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute top-full left-0 w-48 py-2 bg-dark-card border border-white/10 rounded-xl shadow-2xl backdrop-blur-xl"
+                    className={styles.dropdownMenu}
                   >
                     {mockCategory.map((cat) => (
                       <Link
                         key={cat.path}
                         to={cat.path}
-                        className="flex items-center space-x-3 px-4 py-2 text-sm text-gray-400 hover:text-brand-light hover:bg-white/5 transition-all"
+                        className={styles.dropdownItem}
                       >
                         <span className="text-brand-light opacity-70">{cat.icon}</span>
                         <span>{cat.name}</span>
@@ -87,12 +86,12 @@ const Navbar = () => {
             {/* User DropDown When Login */}
             {isAuthenticated ? (
               <div 
-                className="relative"
+                className={styles.dropdownWrapper}
                 onMouseEnter={() => setIsUserDropdownOpen(true)}
                 onMouseLeave={() => setIsUserDropdownOpen(false)}
               >
-                <button className="flex items-center space-x-2 bg-brand-light/10 text-brand-light px-4 py-2 rounded-xl border border-brand-light/20 transition-all font-bold text-sm">
-                  <div className="w-6 h-6 rounded-full bg-brand-light/20 flex items-center justify-center text-[10px]">
+                <button className={styles.userButton}>
+                  <div className={styles.userAvatar}>
                     <User className="w-3 h-3" />
                   </div>
                   <span>{user?.user_name}</span>
@@ -106,11 +105,12 @@ const Navbar = () => {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 10, scale: 0.95 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute top-full right-0 w-48 py-2 mt-1 bg-dark-card border border-white/10 rounded-xl shadow-2xl backdrop-blur-xl"
+                      className={`${styles.dropdownMenu} right-0`}
+                      style={{ left: 'auto' }}
                     >
                       <Link
                         to="/profile"
-                        className="flex items-center space-x-3 px-4 py-2.5 text-sm text-gray-400 hover:text-brand-light hover:bg-white/5 transition-all"
+                        className={styles.dropdownItem}
                       >
                         <Settings className="w-4 h-4" />
                         <span>โปรไฟล์</span>
@@ -119,7 +119,7 @@ const Navbar = () => {
                       {isAuthenticated && user?.role === "admin" && (
                         <Link
                           to="/admin"
-                          className="flex items-center space-x-3 px-4 py-2.5 text-sm text-cyan-500 hover:bg-red-500/10 transition-all"
+                          className={`${styles.dropdownItem} text-cyan-500`}
                         >
                           <ShieldIcon  className="w-4 h-4" />
                           <span>ผู้ดูแลระบบ</span>
@@ -128,7 +128,7 @@ const Navbar = () => {
                      
                       <button
                         onClick={logout}
-                        className="flex items-center space-x-3 w-full px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-all"
+                        className={`${styles.dropdownItem} ${styles.mobileLogoutButton} w-full`}
                       >
                         <LogOut className="w-4 h-4" />
                         <span>ออกจากระบบ</span>
@@ -140,7 +140,7 @@ const Navbar = () => {
             ) : (
               <Link
                 to="/login"
-                className="flex items-center space-x-2 bg-white/5 hover:bg-brand-light/10 text-gray-300 hover:text-brand-light px-4 py-2 rounded-xl transition-all font-medium text-sm border border-white/5 hover:border-brand-light/20"
+                className={styles.loginButton}
               >
                 <LogIn className="w-4 h-4" />
                 <span>เข้าสู่ระบบ</span>
@@ -152,7 +152,7 @@ const Navbar = () => {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-300 hover:text-brand-light p-2"
+              className={styles.mobileMenuButton}
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -167,33 +167,33 @@ const Navbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-dark-bg/95 border-t border-white/5 overflow-hidden backdrop-blur-xl"
+            className={styles.mobileMenu}
           >
-            <div className="px-4 pt-2 pb-6 space-y-1">
+            <div className={styles.mobileMenuContent}>
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center space-x-3 text-gray-300 hover:text-brand-light block py-4 text-base font-medium border-b border-white/5"
+                  className={styles.mobileNavLink}
                 >
-                  <span className="bg-white/5 p-2 rounded-lg">{link.icon}</span>
+                  <span className={styles.mobileNavLinkIcon}>{link.icon}</span>
                   <span>{link.name}</span>
                 </Link>
               ))}
               
-              <div className="pt-4">
-                <div className="flex items-center space-x-2 text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 px-2">
+              <div className={styles.mobileCategorySection}>
+                <div className={styles.mobileCategoryHeader}>
                   <Layers className="w-3 h-3" />
                   <span>หมวดหมู่ทั้งหมด</span>
                 </div>
-                <div className="grid grid-cols-1 gap-2">
+                <div className={styles.mobileCategoryGrid}>
                   {mockCategory.map((cat) => (
                     <Link
                       key={cat.path}
                       to={cat.path}
                       onClick={() => setIsOpen(false)}
-                      className="flex items-center space-x-3 px-4 py-3 rounded-xl bg-white/5 text-gray-300 hover:text-brand-light transition-all"
+                      className={styles.mobileCategoryItem}
                     >
                       {cat.icon}
                       <span>{cat.name}</span>
@@ -202,22 +202,22 @@ const Navbar = () => {
                 </div>
               </div>
 
-              <div className="pt-4 mt-2 border-t border-white/5">
+              <div className={styles.mobileUserSection}>
                 {isAuthenticated ? (
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-3 px-4 py-3 rounded-2xl bg-brand-light/5 border border-brand-light/10 mb-2">
-                      <div className="w-10 h-10 rounded-full bg-brand-light/20 flex items-center justify-center">
+                  <>
+                    <div className={styles.mobileUserInfo}>
+                      <div className={styles.mobileUserAvatarBig}>
                         <User className="w-5 h-5 text-brand-light" />
                       </div>
-                      <div className="flex flex-col">
-                        <span className="text-white font-bold">{user?.user_name}</span>
-                        <span className="text-gray-500 text-xs">{user?.email}</span>
+                      <div className={styles.mobileUserDetails}>
+                        <span className={styles.mobileUserName}>{user?.user_name}</span>
+                        <span className={styles.mobileUserEmail}>{user?.email}</span>
                       </div>
                     </div>
                     <Link
                       to="/profile"
                       onClick={() => setIsOpen(false)}
-                      className="flex items-center space-x-3 w-full px-4 py-4 text-gray-300 hover:text-brand-light text-base border-b border-white/5"
+                      className={styles.mobileActionButton}
                     >
                       <Settings className="w-5 h-5" />
                       <span>จัดการโปรไฟล์</span>
@@ -227,17 +227,17 @@ const Navbar = () => {
                         logout();
                         setIsOpen(false);
                       }}
-                      className="flex items-center space-x-3 w-full px-4 py-4 text-red-400 hover:bg-red-500/5 text-base"
+                      className={`${styles.mobileActionButton} ${styles.mobileLogoutButton}`}
                     >
                       <LogOut className="w-5 h-5" />
                       <span>ออกจากระบบ</span>
                     </button>
-                  </div>
+                  </>
                 ) : (
                   <Link
                     to="/login"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center justify-center space-x-2 w-full bg-brand-light text-dark-bg py-4 rounded-2xl font-bold hover:bg-brand-aqua transition-all"
+                    className={styles.mobileLoginAction}
                   >
                     <LogIn className="w-5 h-5" />
                     <span>เข้าสู่ระบบ</span>

@@ -1,0 +1,63 @@
+.container {
+  @apply pt-32 pb-20;
+}
+
+.wrapper {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.header {
+  @apply mb-12 text-center;
+}
+
+.iconWrapper {
+  @apply inline-flex items-center justify-center p-4 bg-red-500/10 rounded-full mb-6;
+}
+
+.heartIcon {
+  @apply w-8 h-8 text-red-500 fill-red-500;
+}
+
+.title {
+  @apply text-4xl md:text-6xl font-bold text-white mb-6;
+}
+
+.description {
+  @apply text-gray-400 text-lg max-w-2xl mx-auto mb-8;
+}
+
+.loadingWrapper {
+  @apply flex justify-center py-20;
+}
+
+.spinner {
+  @apply w-12 h-12 border-4 border-red-500/20 border-t-red-500 rounded-full animate-spin;
+}
+
+.articleGrid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8;
+}
+
+.articleItem {
+  @apply h-full;
+}
+
+.emptyState {
+  @apply col-span-full text-center py-20 flex flex-col items-center;
+}
+
+.emptyIconWrapper {
+  @apply w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6;
+}
+
+.emptyIcon {
+  @apply w-10 h-10 text-gray-600;
+}
+
+.emptyText {
+  @apply text-gray-500 mb-4 text-lg;
+}
+
+.exploreLink {
+  @apply text-brand-light hover:underline font-medium flex items-center;
+}

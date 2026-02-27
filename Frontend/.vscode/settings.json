@@ -1,0 +1,9 @@
+{
+  "css.lint.unknownAtRules": "ignore",
+  "tailwindCSS.includeLanguages": {
+    "css": "css"
+  },
+  "files.associations": {
+    "*.module.css": "tailwindcss"
+  }
+}

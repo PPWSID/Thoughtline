@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 :root {
   color-scheme: dark;
 }
@@ -25,16 +26,17 @@ body {
   }
 }
 
-.glass-card {
-  background: rgba(22, 30, 38, 0.7);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
+@layer components {
+  .glass-card {
+    background: rgba(22, 30, 38, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
 
-.text-gradient {
-  background: linear-gradient(135deg, #00ffff 0%, #7fffd4 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  .text-gradient {
+    background: linear-gradient(135deg, #00ffff 0%, #7fffd4 100%);
+    @apply bg-clip-text text-transparent;
+  }
 }
 
 ::selection {

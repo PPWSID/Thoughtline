@@ -5,6 +5,7 @@ import { Article } from '../types/article';
 import { useAuth } from '../AuthContext';
 import favoriteservice from '../service/favoriteservice';
 import { useState, useEffect } from 'react';
+import styles from '../styles/ArticleCard.module.css';
 
 interface ArticleCardProps {
   article: Article;
@@ -47,58 +48,55 @@ const ArticleCard = ({ article, initialIsFavorite = false, onToggleFavorite }: A
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      whileHover={{ y: -5 }}
+      className={styles.cardContainer}
       transition={{ duration: 0.3 }}
-      className="group h-full relative"
     >
       {isAuthenticated && (
         <button 
           onClick={handleFavorite}
-          className="absolute top-4 right-4 z-10 p-2 bg-black/40 backdrop-blur-md rounded-full border border-white/10 hover:bg-black/60 transition-all active:scale-90"
+          className={styles.favoriteButton}
         >
-          <Heart className={`w-4 h-4 transition-colors ${isFavorite ? 'fill-red-500 text-red-500' : 'text-white'}`} />
+          <Heart className={`${styles.heartIcon} ${isFavorite ? styles.heartIconActive : ''}`} />
         </button>
       )}
 
       <Link to={`/article/${article.id}`} className="block h-full">
-        <div className="bg-dark-card border border-dark-border rounded-2xl overflow-hidden h-full flex flex-col group-hover:border-brand-light/30 transition-colors shadow-xl">
+        <div className={styles.cardBox}>
           
           {/* Image Container */}
-          <div className="relative h-48 overflow-hidden">
+          <div className={styles.imageContainer}>
             <img
               src={article.coverImage}
               alt={article.title}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              className={styles.image}
             />
-            <div className="absolute top-4 left-4">
-              <span className="bg-brand-light/90 text-dark-bg px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                {article.category}
-              </span>
+            <div className={styles.categoryBadge}>
+              {article.category}
             </div>
           </div>
 
           {/* Content */}
-          <div className="p-6 flex flex-col flex-grow">
-            <div className="flex items-center space-x-4 text-xs text-gray-400 mb-3">
-              <div className="flex items-center space-x-1">
+          <div className={styles.contentWrapper}>
+            <div className={styles.metadata}>
+              <div className={styles.metaItem}>
                 <Calendar className="w-3.5 h-3.5" />
                 <span>{article.publishedAt}</span>
               </div>
-              <div className="flex items-center space-x-1">
+              <div className={styles.metaItem}>
                 <Clock className="w-3.5 h-3.5" />
                 <span>{article.readTime}</span>
               </div>
             </div>
 
-            <h3 className="text-xl font-bold text-white mb-3 group-hover:text-brand-light transition-colors line-clamp-2">
+            <h3 className={styles.title}>
               {article.title}
             </h3>
 
-            <p className="text-gray-400 text-sm mb-6 line-clamp-3 leading-relaxed">
+            <p className={styles.excerpt}>
               {article.excerpt}
             </p>
 
-            <div className="mt-auto flex items-center text-brand-aqua font-semibold text-sm group-hover:translate-x-1 transition-transform">
+            <div className={styles.readMore}>
               อ่านเพิ่มเติม <ChevronRight className="w-4 h-4 ml-1" />
             </div>
           </div>

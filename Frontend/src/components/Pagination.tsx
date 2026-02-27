@@ -1,4 +1,5 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import styles from '../styles/Pagination.module.css';
 
 interface PaginationProps {
   currentPage: number;
@@ -29,10 +30,8 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: PaginationProps) 
           <button
             key={i}
             onClick={() => handlePageChange(i)}
-            className={`w-10 h-10 rounded-xl border font-bold transition-all ${
-              currentPage === i
-                ? 'bg-brand-light border-brand-light text-dark-bg transition-transform scale-110 z-10'
-                : 'bg-white/5 border-white/10 text-gray-400 hover:border-brand-light/50 hover:text-brand-light hover:scale-105'
+            className={`${styles.pageButton} ${
+              currentPage === i ? styles.activePage : styles.inactivePage
             }`}
           >
             {i}
@@ -43,7 +42,7 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: PaginationProps) 
         i === currentPage + showRange + 1
       ) {
         pages.push(
-          <span key={i} className="text-gray-600 px-1">...</span>
+          <span key={i} className={styles.ellipsis}>...</span>
         );
       }
     }
@@ -51,23 +50,23 @@ const Pagination = ({ currentPage, totalPages, onPageChange }: PaginationProps) 
   };
 
   return (
-    <div className="mt-16 flex justify-center items-center space-x-2">
+    <div className={styles.paginationContainer}>
       <button
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="p-2 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-brand-light hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+        className={styles.navButton}
       >
         <ChevronLeft className="w-5 h-5" />
       </button>
 
-      <div className="flex items-center space-x-2">
+      <div className={styles.pageNumberWrapper}>
         {renderPageNumbers()}
       </div>
 
       <button
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="p-2 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-brand-light hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+        className={styles.navButton}
       >
         <ChevronRight className="w-5 h-5" />
       </button>

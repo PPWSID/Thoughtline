@@ -9,6 +9,8 @@ import {
 import ReactMarkdown from 'react-markdown';
 import apiService from '../service/articleservice';
 import { mockCategory } from '../data/mockCategory';
+import styles from '../styles/CreateArticle.module.css';
+// import { textarea } from 'framer-motion/client';
 
 interface Block {
   id: string;
@@ -42,7 +44,6 @@ const parseMarkdownToBlocks = (markdown: string): Block[] => {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     
-    // Heading
     if (line.match(/^#+\s/)) {
       flushText();
       const level = (line.match(/^#+/)?.[0].length || 2);
@@ -53,7 +54,6 @@ const parseMarkdownToBlocks = (markdown: string): Block[] => {
         metadata: { level }
       });
     } 
-    // Image
     else if (line.match(/^!\[.*\]\(.*\)/)) {
       flushText();
       const match = line.match(/^!\[(.*)\]\((.*)\)/);
@@ -64,7 +64,6 @@ const parseMarkdownToBlocks = (markdown: string): Block[] => {
         metadata: { caption: match?.[1] || '' }
       });
     }
-    // Code
     else if (line.startsWith('```')) {
       flushText();
       const lang = line.slice(3).trim();
@@ -81,7 +80,6 @@ const parseMarkdownToBlocks = (markdown: string): Block[] => {
         metadata: { language: lang || 'javascript' }
       });
     }
-    // Regular text
     else {
       if (line.trim() || currentText) {
         currentText += line + '\n';
@@ -118,22 +116,20 @@ const BlockItem = ({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="group relative"
+      className={styles.blockItem}
     >
       {!isPreview ? (
-        <div className="flex gap-4">
-          {/* Drag Handle - Only this part can start the drag */}
+        <div className={styles.blockWrapper}>
           <div 
             onPointerDown={(e) => dragControls.start(e)}
-            className="flex flex-col items-center pt-3 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
+            className={styles.dragHandle}
           >
             <GripVertical className="w-5 h-5 text-gray-600" />
           </div>
 
-          {/* Block Editor UI */}
-          <div className="flex-grow bg-dark-card/50 border border-dark-border rounded-2xl p-6 hover:border-brand-light/30 transition-all focus-within:border-brand-light/50 focus-within:bg-dark-card">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-gray-500">
+          <div className={styles.blockEditor}>
+            <div className={styles.blockMetaRow}>
+              <div className={styles.blockTypeInfo}>
                 {block.type === 'text' && <Type className="w-3 h-3" />}
                 {block.type === 'heading' && <HeadingIcon className="w-3 h-3" />}
                 {block.type === 'image' && <ImageIcon className="w-3 h-3" />}
@@ -142,7 +138,7 @@ const BlockItem = ({
               </div>
               <button 
                 onClick={() => removeBlock(block.id)}
-                className="text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                className={styles.removeBlockBtn}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -161,16 +157,16 @@ const BlockItem = ({
                   target.style.height = 'auto';
                   target.style.height = target.scrollHeight + 'px';
                 }}
-                className="w-full bg-transparent border-none text-gray-300 resize-none outline-none leading-relaxed text-lg"
+                className={styles.textEditor}
               />
             )}
 
             {block.type === 'heading' && (
-              <div className="flex items-center gap-4">
+              <div className={styles.headingRow}>
                 <select 
                   value={block.metadata?.level}
                   onChange={(e) => updateBlock(block.id, block.content, { level: parseInt(e.target.value) })}
-                  className="bg-dark-bg border border-dark-border rounded-lg px-2 py-1 text-xs text-gray-400 outline-none"
+                  className={styles.levelSelect}
                 >
                   <option value={2}>H2</option>
                   <option value={3}>H3</option>
@@ -181,29 +177,29 @@ const BlockItem = ({
                   placeholder="ใส่หัวข้อรอง..."
                   value={block.content}
                   onChange={(e) => updateBlock(block.id, e.target.value)}
-                  className="flex-grow bg-transparent border-none text-2xl font-bold text-white outline-none"
+                  className={styles.headingInput}
                 />
               </div>
             )}
 
             {block.type === 'image' && (
-              <div className="space-y-4">
+              <div className={styles.imageEditor}>
                 <input 
                   type="text"
                   placeholder="ใส่ URL รูปภาพ..."
                   value={block.content}
                   onChange={(e) => updateBlock(block.id, e.target.value)}
-                  className="w-full bg-dark-bg border border-dark-border rounded-xl px-4 py-2 text-sm text-white outline-none focus:border-brand-light/50"
+                  className={styles.imageUrlInput}
                 />
                 <input 
                   type="text"
                   placeholder="คำบรรยายรูปภาพ (Caption)..."
                   value={block.metadata?.caption || ''}
                   onChange={(e) => updateBlock(block.id, block.content, { caption: e.target.value })}
-                  className="w-full bg-transparent border-none text-xs text-gray-500 outline-none italic"
+                  className={styles.imageCaptionInput}
                 />
                 {block.content && (
-                  <div className="mt-4 rounded-xl overflow-hidden border border-white/5">
+                  <div className={styles.articleImagePreview}>
                     <img src={block.content} alt="Block Preview" className="w-full max-h-[300px] object-cover" />
                   </div>
                 )}
@@ -211,30 +207,29 @@ const BlockItem = ({
             )}
 
             {block.type === 'code' && (
-              <div className="space-y-4">
+              <div className={styles.codeEditor}>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500">ภาษา:</span>
+                  <span className={styles.langInputLabel}>ภาษา:</span>
                   <input 
                     type="text" 
                     placeholder="เช่น typescript, python..."
                     value={block.metadata?.language || ''}
                     onChange={(e) => updateBlock(block.id, block.content, { language: e.target.value })}
-                    className="bg-dark-bg border border-dark-border rounded-lg px-3 py-1 text-xs text-brand-aqua outline-none"
+                    className={styles.langInput}
                   />
                 </div>
                 <textarea 
                   placeholder="วางโค้ดที่นี่..."
                   value={block.content}
                   onChange={(e) => updateBlock(block.id, e.target.value)}
-                  className="w-full bg-dark-bg border border-dark-border rounded-xl p-4 text-sm font-mono text-brand-aqua outline-none min-h-[150px]"
+                  className={styles.codeTextarea}
                 />
               </div>
             )}
           </div>
 
-          {/* Add block button between */}
-          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-            <div className="flex items-center space-x-1 bg-dark-card border border-brand-light/20 rounded-full p-1 shadow-xl">
+          <div className={styles.inlineAddBlock}>
+            <div className={styles.inlineAddBox}>
               <BlockActionBtn icon={<Type />} onClick={() => addBlock('text', index)} tooltip="ข้อความ" />
               <BlockActionBtn icon={<HeadingIcon />} onClick={() => addBlock('heading', index)} tooltip="หัวข้อ" />
               <BlockActionBtn icon={<ImageIcon />} onClick={() => addBlock('image', index)} tooltip="รูปภาพ" />
@@ -243,8 +238,7 @@ const BlockItem = ({
           </div>
         </div>
       ) : (
-        /* Preview Mode Rendering - Matches Article Detail Prose */
-        <div className="prose prose-invert max-w-none">
+        <div className={styles.previewProse}>
           {block.type === 'text' && <ReactMarkdown>{block.content}</ReactMarkdown>}
           {block.type === 'heading' && React.createElement(`h${block.metadata?.level || 2}`, {}, block.content)}
           {block.type === 'image' && block.content && (
@@ -256,11 +250,11 @@ const BlockItem = ({
             </figure>
           )}
           {block.type === 'code' && block.content && (
-            <div className="my-8">
-              <div className="flex items-center justify-between bg-dark-card border-x border-t border-dark-border rounded-t-xl px-4 py-2">
-                <span className="text-xs text-gray-500 font-mono italic">{block.metadata?.language}</span>
+            <div className={styles.codePreviewWrapper}>
+              <div className={styles.codePreviewHeader}>
+                <span className={styles.codeLangBadge}>{block.metadata?.language}</span>
               </div>
-              <pre className="!mt-0 !rounded-t-none">
+              <pre className={styles.codePre}>
                 <code>{block.content}</code>
               </pre>
             </div>
@@ -300,7 +294,6 @@ const CreateArticle = () => {
             setCategory(article.category);
             setCoverImage(article.coverImage);
             setExcerpt(article.excerpt);
-            // Parse Markdown back to blocks
             setBlocks(parseMarkdownToBlocks(article.content));
           }
         } catch (error) {
@@ -309,7 +302,6 @@ const CreateArticle = () => {
       };
       fetchArticle();
     } else {
-      // Reset state for new article
       setTitle('');
       setCategory('Default');
       setCoverImage('');
@@ -403,23 +395,20 @@ const CreateArticle = () => {
   };
 
   return (
-    <div className="pt-32 pb-20 min-h-screen">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        {/* Navigation & Actions */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
+    <div className={styles.container}>
+      <div className={styles.wrapper}>
+        <div className={styles.navRow}>
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-            <Link to="/" className="inline-flex items-center text-gray-400 hover:text-brand-light transition-colors group">
-              <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-1 transition-transform" />
+            <Link to="/" className={styles.backLink}>
+              <ChevronLeft className={styles.backIcon} />
               กลับไปที่หน้าบทความ
             </Link>
           </motion.div>
 
-          <div className="flex items-center gap-4">
+          <div className={styles.actionRow}>
             <button 
               onClick={() => setIsPreview(!isPreview)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium transition-all ${
-                isPreview ? 'bg-brand-light text-dark-bg' : 'bg-dark-card border border-dark-border text-white hover:bg-white/5'
-              }`}
+              className={`${styles.previewButton} ${isPreview ? styles.previewButtonActive : styles.previewButtonInactive}`}
             >
               <Eye className="w-4 h-4" />
               <span>{isPreview ? 'กลับไปแก้ไข' : 'ดูตัวอย่าง'}</span>
@@ -427,7 +416,7 @@ const CreateArticle = () => {
             <button 
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className={`flex items-center space-x-2 bg-brand-light text-dark-bg px-6 py-2.5 rounded-xl font-bold hover:bg-brand-aqua transition-all transform hover:scale-[1.05] active:scale-[0.95] shadow-lg shadow-brand-light/20 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`${styles.submitButton} ${isSubmitting ? styles.submitting : ''}`}
             >
               <Send className={`w-4 h-4 ${isSubmitting ? 'animate-pulse' : ''}`} />
               <span>{isSubmitting ? (isEdit ? 'กำลังบันทึก...' : 'กำลังเผยแพร่...') : (isEdit ? 'บันทึกการแก้ไข' : 'เผยแพร่')}</span>
@@ -435,24 +424,22 @@ const CreateArticle = () => {
           </div>
         </div>
 
-        {/* Editor Area */}
-        <div className="max-w-4xl mx-auto">
-          {/* Header Editor */}
+        <div className={styles.editorArea}>
           {!isPreview ? (
-            <motion.header className="mb-12 space-y-6">
+            <motion.header className={styles.headerEditor}>
               <div className="flex flex-col space-y-4">
                 <input 
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="ใส่ชื่อบทความที่นี่..."
-                  className="text-4xl md:text-6xl font-bold bg-transparent border-none text-white placeholder:text-white/20 outline-none w-full"
+                  className={styles.titleInput}
                 />
-                <div className="flex flex-wrap items-center gap-4 text-sm">
+                <div className={styles.metaRow}>
                   <select 
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="bg-dark-card text-brand-light border border-white/10 rounded-full px-4 py-1 font-semibold outline-none hover:border-brand-light/30 transition-all cursor-pointer"
+                    className={styles.categorySelect}
                   >
                     <option value="Default">Default</option>
                     {mockCategory.map((cat) => (
@@ -461,14 +448,14 @@ const CreateArticle = () => {
                       </option>
                     ))}
                   </select>
-                  <div className="flex items-center space-x-2 bg-dark-card border border-dark-border rounded-full px-4 py-1 text-gray-400 focus-within:border-brand-light/50 transition-colors">
+                  <div className={styles.coverInputWrapper}>
                     <ImageIcon className="w-4 h-4" />
                     <input 
                       type="text"
                       value={coverImage}
                       onChange={(e) => setCoverImage(e.target.value)}
                       placeholder="ใส่ URL รูปภาพหน้าปก..."
-                      className="bg-transparent border-none outline-none w-64 text-xs"
+                      className={styles.coverInput}
                     />
                   </div>
                 </div>
@@ -477,33 +464,31 @@ const CreateArticle = () => {
                   value={excerpt}
                   onChange={(e) => setExcerpt(e.target.value)}
                   placeholder="เขียนสรุปสั้นๆ (Excerpt) เพื่อดึงดูดผู้อ่าน..."
-                  className="w-full bg-transparent border-none text-gray-400 placeholder:text-gray-400/30 outline-none resize-none text-sm italic"
+                  className={styles.excerptTextarea}
                   rows={2}
                 />
               </div>
               
               {coverImage && (
-                <div className="rounded-3xl overflow-hidden aspect-[21/9] border border-white/5">
-                  <img src={coverImage} alt="Cover Preview" className="w-full h-full object-cover" />
+                <div className={styles.coverPreview}>
+                  <img src={coverImage} alt="Cover Preview" className={styles.coverImage} />
                 </div>
               )}
             </motion.header>
           ) : (
-            /* Preview Header - Matches Article Detail */
-            <header className="mb-12">
-              <div className="text-brand-aqua font-semibold uppercase tracking-widest text-sm mb-4">{category}</div>
-              <h1 className="text-3xl md:text-5xl font-bold text-white mb-8 leading-tight">{title || 'ชื่อบทความ'}</h1>
+            <header className={styles.previewHeader}>
+              <div className={styles.previewCategory}>{category}</div>
+              <h1 className={styles.previewTitle}>{title || 'ชื่อบทความ'}</h1>
               {coverImage && (
-                <div className="mb-12 rounded-3xl overflow-hidden shadow-2xl border border-white/5">
-                  <img src={coverImage} alt={title} className="w-full h-[400px] object-cover" />
+                <div className={styles.previewCover}>
+                  <img src={coverImage} alt={title} className={styles.previewCoverImage} />
                 </div>
               )}
             </header>
           )}
 
-          {/* Dynamic Blocks */}
-          <div className="space-y-4 relative">
-            <Reorder.Group axis="y" values={blocks} onReorder={setBlocks} className="space-y-6">
+          <div className={styles.blockContainer}>
+            <Reorder.Group axis="y" values={blocks} onReorder={setBlocks} className={styles.blockGroup}>
               <AnimatePresence initial={false}>
                 {blocks.map((block, index) => (
                   <BlockItem 
@@ -519,10 +504,9 @@ const CreateArticle = () => {
               </AnimatePresence>
             </Reorder.Group>
 
-            {/* Bottom Add Block Control */}
             {!isPreview && blocks.length > 0 && (
-              <div className="flex justify-center pt-8">
-                <div className="flex items-center space-x-3 bg-dark-card border border-dark-border rounded-2xl px-6 py-4 shadow-2xl">
+              <div className={styles.bottomAddBlock}>
+                <div className={styles.largeActionBox}>
                    <BlockActionBtnLarge icon={<Type />} label="ข้อความ" onClick={() => addBlock('text')} />
                    <BlockActionBtnLarge icon={<HeadingIcon />} label="หัวข้อ" onClick={() => addBlock('heading')} />
                    <BlockActionBtnLarge icon={<ImageIcon />} label="รูปภาพ" onClick={() => addBlock('image')} />
@@ -531,32 +515,29 @@ const CreateArticle = () => {
               </div>
             )}
           </div>
-          
         </div>
-
       </div>
 
-      {/* Beautiful Notification Toast */}
       <AnimatePresence>
         {notification.show && (
           <motion.div
             initial={{ opacity: 0, y: 50, scale: 0.9, x: '-50%' }}
             animate={{ opacity: 1, y: 0, scale: 1, x: '-50%' }}
             exit={{ opacity: 0, y: 20, scale: 0.9, x: '-50%' }}
-            className="fixed bottom-10 left-1/2 z-[100]"
+            className={styles.toastContainer}
           >
             <div className={`
-              relative flex items-center space-x-4 px-6 py-4 rounded-2xl border backdrop-blur-xl shadow-2xl
-              ${notification.type === 'success' 
-                ? 'bg-green-500/10 border-green-500/20 shadow-green-500/10' 
-                : 'bg-red-500/10 border-red-500/20 shadow-red-500/10'}
+              ${styles.toast}
+              ${notification.type === 'success' ? styles.toastSuccess : styles.toastError}
             `}>
-              {/* Glow Effect */}
-              <div className={`absolute inset-0 blur-2xl opacity-20 rounded-2xl -z-10 ${notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`} />
+              <div className={`
+                ${styles.toastGlow} 
+                ${notification.type === 'success' ? styles.glowSuccess : styles.glowError}
+              `} />
               
               <div className={`
-                w-10 h-10 rounded-full flex items-center justify-center shrink-0
-                ${notification.type === 'success' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}
+                ${styles.toastIconWrapper}
+                ${notification.type === 'success' ? styles.iconSuccess : styles.iconError}
               `}>
                 {notification.type === 'success' ? (
                   <motion.div
@@ -571,29 +552,28 @@ const CreateArticle = () => {
                 )}
               </div>
 
-              <div className="flex flex-col">
-                <span className="text-white font-bold tracking-wide">
+              <div className={styles.toastContent}>
+                <span className={styles.toastTitle}>
                   {notification.type === 'success' ? 'สำเร็จ!' : 'ขออภัย'}
                 </span>
-                <span className="text-gray-400 text-sm">
+                <span className={styles.toastMsg}>
                   {notification.message}
                 </span>
               </div>
 
               <button 
                 onClick={() => setNotification(prev => ({ ...prev, show: false }))}
-                className="ml-4 p-1 rounded-lg hover:bg-white/5 text-gray-500 transition-colors"
+                className={styles.toastClose}
               >
                 <X className="w-4 h-4" />
               </button>
 
-              {/* Progress Bar (Success only) */}
               {notification.type === 'success' && (
                 <motion.div 
                   initial={{ width: '100%' }}
                   animate={{ width: '0%' }}
                   transition={{ duration: 2, ease: 'linear' }}
-                  className="absolute bottom-0 left-0 h-1 bg-green-500/50 rounded-full"
+                  className={styles.progressBar}
                 />
               )}
             </div>
@@ -609,7 +589,7 @@ const BlockActionBtn = ({ icon, onClick, tooltip }: { icon: React.ReactNode, onC
   <button 
     onClick={onClick}
     title={tooltip}
-    className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-brand-light hover:bg-brand-light/10 transition-all"
+    className={styles.actionBtn}
   >
     {React.cloneElement(icon as React.ReactElement, { size: 16 })}
   </button>
@@ -618,7 +598,7 @@ const BlockActionBtn = ({ icon, onClick, tooltip }: { icon: React.ReactNode, onC
 const BlockActionBtnLarge = ({ icon, label, onClick }: { icon: React.ReactNode, label: string, onClick: () => void }) => (
   <button 
     onClick={onClick}
-    className="flex items-center space-x-2 px-4 py-2 rounded-xl text-gray-400 hover:text-brand-light hover:bg-brand-light/5 transition-all text-sm font-medium"
+    className={styles.actionBtnLarge}
   >
     {React.cloneElement(icon as React.ReactElement, { size: 18 })}
     <span>{label}</span>

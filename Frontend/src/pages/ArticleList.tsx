@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import apiService from '../service/articleservice';
 import Pagination from '../components/Pagination';
 import { useAuth } from '../AuthContext';
+import styles from '../styles/ArticleList.module.css';
 
 const ArticleList = () => {
   const { isAuthenticated } = useAuth();
@@ -27,12 +28,8 @@ const ArticleList = () => {
         let response: any;
 
         if (isAuthenticated) {
-          // console.log(isAuthenticated);
-          // ถ้า Login แล้ว ใช้ getArticlesWithLogin 
           response = await apiService.getArticlesWithLogin(fetchParams);
         } else {
-          // ถ้ายังไม่ Login
-          // console.log(isAuthenticated);
           response = category 
             ? await apiService.getArticlesByFilter(fetchParams)
             : await apiService.getArticles({ page: currentPage, limit });
@@ -70,14 +67,15 @@ const ArticleList = () => {
       navigate(`/?${params.toString()}`);
     }
   };
+
   return (
-    <div className="pt-32 pb-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <header className="mb-12 text-center">
+    <div className={styles.container}>
+      <div className={styles.wrapper}>
+        <header className={styles.header}>
           <motion.h1 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="text-4xl md:text-6xl font-bold text-white mb-6"
+            className={styles.title}
           >
             {category ? (
               <>หมวดหมู่ <span className="text-gradient">{category}</span></>
@@ -89,7 +87,7 @@ const ArticleList = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="text-gray-400 text-lg max-w-2xl mx-auto mb-8"
+            className={styles.description}
           >
             ศูนย์รวมบทความด้านเทคโนโลยี ดีไซน์ และนวัตกรรม ที่จะช่วยเติมเต็มจินตนาการของคุณ 
             อ่านง่าย สบายตา พร้อมเนื้อหาที่ทันสมัย
@@ -99,11 +97,11 @@ const ArticleList = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="flex justify-center"
+            className={styles.actionWrapper}
           >
             <button 
               onClick={() => navigate('/create')}
-              className="flex items-center space-x-2 bg-brand-light text-dark-bg px-6 py-3 rounded-xl font-bold hover:bg-brand-aqua transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-brand-light/20"
+              className={styles.createButton}
             >
               <Plus className="w-5 h-5" />
               <span>สร้างบทความใหม่</span>
@@ -112,12 +110,12 @@ const ArticleList = () => {
         </header>
 
         {loading ? (
-          <div className="flex justify-center py-20">
-            <div className="w-12 h-12 border-4 border-brand-light/20 border-t-brand-light rounded-full animate-spin"></div>
+          <div className={styles.loadingWrapper}>
+            <div className={styles.spinner}></div>
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className={styles.articleGrid}>
               {articles.length > 0 ? (
                 articles.map((article, index) => (
                   <motion.div
@@ -125,13 +123,13 @@ const ArticleList = () => {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="h-full"
+                    className={styles.articleItem}
                   >
                     <ArticleCard article={article} />
                   </motion.div>
                 ))
               ) : (
-                <div className="col-span-full text-center py-20 text-gray-500">
+                <div className={styles.emptyState}>
                   ยังไม่มีบทความในขณะนี้
                 </div>
               )}

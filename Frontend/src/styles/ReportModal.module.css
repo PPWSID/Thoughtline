@@ -1,0 +1,248 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(12px);
+}
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 32rem; /* max-w-lg */
+  background: rgba(22, 30, 38, 0.7); /* glass-card equivalent */
+  backdrop-filter: blur(10px);
+  border-radius: 2rem;
+  padding: 2rem; /* p-8 */
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glowTopRed {
+  position: absolute;
+  top: -5rem;
+  right: -5rem;
+  width: 10rem;
+  height: 10rem;
+  background-color: rgba(239, 68, 68, 0.1);
+  filter: blur(80px);
+  border-radius: 9999px;
+}
+
+.closeButton {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  padding: 0.5rem;
+  color: #6b7280;
+  transition: color 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+}
+
+.closeButton:hover {
+  color: white;
+}
+
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.iconBoxRed {
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  background-color: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  display: flex;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+}
+
+.description {
+  color: #9ca3af;
+  margin-bottom: 1.5rem;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+}
+
+.reasonsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  max-height: 40vh;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.reasonsList::-webkit-scrollbar {
+  width: 4px;
+}
+
+.reasonsList::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.reasonsList::-webkit-scrollbar-thumb {
+  background: #2a353f;
+  border-radius: 10px;
+}
+
+.reasonsList::-webkit-scrollbar-thumb:hover {
+  background: #ef4444;
+}
+
+.reasonItem {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.reasonActive {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: white;
+}
+
+.reasonInactive {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.05);
+  color: #9ca3af;
+}
+
+.reasonInactive:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.radioCircle {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  border: 2px solid #4b5563;
+  margin-right: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.radioCircleActive {
+  border-color: #ef4444;
+}
+
+.radioInner {
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 9999px;
+  background-color: #ef4444;
+}
+
+.textarea {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 1rem;
+  color: white;
+  margin-bottom: 2rem;
+  min-height: 100px;
+  transition: all 0.3s ease;
+  resize: vertical;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.footer {
+  display: flex;
+  width: 100%;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cancelButton {
+  flex: 0.8;
+  padding: 1rem 1.5rem;
+  border-radius: 1rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #d1d5db;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.875rem;
+}
+
+.cancelButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.cancelButton:active {
+  transform: scale(0.95);
+}
+
+.submitButton {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  border-radius: 1rem;
+  background-color: #ef4444;
+  color: white;
+  font-weight: 900;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.875rem;
+  border: none;
+}
+
+.submitButton:hover {
+  transform: scale(1.02);
+}
+
+.submitButton:active {
+  transform: scale(0.95);
+}

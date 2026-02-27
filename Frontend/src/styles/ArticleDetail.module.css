@@ -1,0 +1,149 @@
+.container {
+  @apply pt-32 pb-20;
+}
+
+.wrapper {
+  @apply max-w-4xl mx-auto px-4 sm:px-6;
+}
+
+.loadingContainer {
+  @apply pt-32 pb-20 flex justify-center;
+}
+
+.spinner {
+  @apply w-12 h-12 border-4 border-brand-light/20 border-t-brand-light rounded-full animate-spin;
+}
+
+.notFound {
+  @apply pt-32 pb-20 text-center;
+}
+
+.notFoundTitle {
+  @apply text-2xl text-white;
+}
+
+.backLink {
+  @apply text-brand-light mt-4 inline-block hover:underline;
+}
+
+.backButtonWrapper {
+  @apply mb-8;
+}
+
+.backButton {
+  @apply inline-flex items-center text-gray-400 hover:text-brand-light transition-colors;
+}
+
+.backIcon {
+  @apply w-5 h-5 mr-1 transition-transform;
+}
+
+.backButton:hover .backIcon {
+  @apply -translate-x-1;
+}
+
+.header {
+  @apply mb-12;
+}
+
+.categoryBadge {
+  @apply flex items-center space-x-2 text-brand-aqua font-semibold uppercase tracking-widest text-sm mb-4;
+}
+
+.title {
+  @apply text-3xl md:text-5xl font-bold text-white mb-8 leading-tight;
+}
+
+.metaRow {
+  @apply flex flex-wrap items-center gap-6 text-gray-400 border-y border-white/5 py-4;
+}
+
+.authorInfo {
+  @apply flex items-center space-x-2;
+}
+
+.authorAvatar {
+  @apply w-8 h-8 rounded-full bg-brand-dark flex items-center justify-center text-white font-bold text-xs;
+}
+
+.authorName {
+  @apply text-sm font-medium;
+}
+
+.metaItem {
+  @apply flex items-center space-x-1.5 text-sm;
+}
+
+.actionButtons {
+  @apply ml-auto flex items-center space-x-4;
+}
+
+.editLink {
+  @apply flex items-center space-x-2 text-gray-400 hover:text-brand-light transition-colors;
+}
+
+.shareLink {
+  @apply text-gray-400 hover:text-brand-light transition-colors;
+}
+
+.favoriteButton {
+  @apply transition-all active:scale-90;
+}
+
+.favoriteActive {
+  @apply text-red-500;
+}
+
+.favoriteInactive {
+  @apply text-gray-400 hover:text-red-500;
+}
+
+.deleteButton {
+  @apply flex items-center space-x-2 text-gray-400 hover:text-red-500 transition-colors;
+}
+
+.reportButton {
+  @apply flex items-center space-x-2 text-gray-400 hover:text-red-500 transition-colors;
+}
+
+.coverImageWrapper {
+  @apply mb-12 rounded-3xl overflow-hidden shadow-2xl border border-white/5;
+}
+
+.coverImage {
+  @apply w-full h-[400px] object-cover;
+}
+
+.content {
+  @apply prose prose-invert max-w-none;
+}
+
+.content pre {
+  @apply bg-[#1a232e] border border-white/5 rounded-2xl p-6 my-8 overflow-x-auto;
+}
+
+.content code {
+  @apply text-brand-aqua text-sm font-mono bg-transparent p-0;
+}
+
+/* Inline code styling */
+.content :not(pre) > code {
+  @apply bg-white/5 px-1.5 py-0.5 rounded-md text-brand-light text-xs font-bold;
+}
+
+.footerSection {
+  @apply mt-16 pt-8 border-t border-white/5;
+}
+
+.footerTitle {
+  @apply text-white font-semibold mb-4;
+}
+
+.tagList {
+  @apply flex gap-2;
+}
+
+.tagBadge {
+  @apply px-3 py-1 bg-dark-card border border-dark-border rounded-full text-xs text-gray-400;
+}
+

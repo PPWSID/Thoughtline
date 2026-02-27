@@ -1,0 +1,47 @@
+.container {
+  @apply pt-32 pb-20;
+}
+
+.wrapper {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.header {
+  @apply mb-12 text-center;
+}
+
+.title {
+  @apply text-4xl md:text-6xl font-bold text-white mb-6;
+}
+
+.description {
+  @apply text-gray-400 text-lg max-w-2xl mx-auto mb-8;
+}
+
+.actionWrapper {
+  @apply flex justify-center;
+}
+
+.createButton {
+  @apply flex items-center space-x-2 bg-brand-light text-dark-bg px-6 py-3 rounded-xl font-bold hover:bg-brand-aqua transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-brand-light/20;
+}
+
+.loadingWrapper {
+  @apply flex justify-center py-20;
+}
+
+.spinner {
+  @apply w-12 h-12 border-4 border-brand-light/20 border-t-brand-light rounded-full animate-spin;
+}
+
+.articleGrid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8;
+}
+
+.emptyState {
+  @apply col-span-full text-center py-20 text-gray-500;
+}
+
+.articleItem {
+  @apply h-full;
+}
